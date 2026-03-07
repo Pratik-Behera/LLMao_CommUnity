@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Member Management - CommUnity Admin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3994ef",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+    <div
+        class="mx-auto min-h-screen max-w-[414px] bg-background-light dark:bg-background-dark flex flex-col shadow-2xl relative">
+        <header
+            class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+            <div class="flex items-center p-4 gap-3">
+                <button
+                    class="flex items-center justify-center p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+                    <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">arrow_back</span>
+                </button>
+                <div class="flex-1">
+                    <h1 class="text-xl font-bold tracking-tight">Member Management</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">8 total community members</p>
+                </div>
+                <button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800">
+                    <span class="material-symbols-outlined text-slate-700 dark:text-slate-300">search</span>
+                </button>
+            </div>
+        </header>
+        <main class="flex-1 overflow-y-auto pb-24">
+            <div class="p-4 space-y-3">
+                <!-- Member Row 1 -->
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        SJ</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold truncate">Sarah Jenkins</h3>
+                            <span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium">Zone
+                                A</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Jurong • 6 months</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Member Row 2 -->
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        MT</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold truncate">Marcus T.</h3>
+                            <span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 font-medium">Zone
+                                B</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Bishan • 2 months</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Member Row 3 -->
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        CW</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold truncate">Chen Wei</h3>
+                            <span class="material-symbols-outlined text-red-500 text-xl">cancel</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-medium">Zone
+                                C</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Bedok • 0 months</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Member Row 4 -->
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        AS</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold truncate">Amira S.</h3>
+                            <span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-medium">Zone
+                                D</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Woodlands • 4 months</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Member Row 5 -->
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        DL</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold truncate">David L.</h3>
+                            <span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium">Zone
+                                A</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Jurong • 1 month</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Member Row 6 -->
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        PK</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold truncate">Priya K.</h3>
+                            <span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 font-medium">Zone
+                                B</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Bishan • 8 months</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Member Row 7 -->
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        RC</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold truncate">Robert C.</h3>
+                            <span class="material-symbols-outlined text-green-500 text-xl">check_circle</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-medium">Zone
+                                C</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Bedok • 3 months</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Member Row 8 -->
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
+                        LM</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold truncate">Linda M.</h3>
+                            <span class="material-symbols-outlined text-red-500 text-xl">cancel</span>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span
+                                class="text-xs px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 font-medium">Zone
+                                D</span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400">Woodlands • 0 months</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <nav
+            class="fixed bottom-0 w-full max-w-[414px] bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-between items-center z-20">
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+                <span class="material-symbols-outlined">home</span>
+                <span class="text-[10px] font-medium">Home</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-primary transition-colors" href="#">
+                <span class="material-symbols-outlined font-bold">group</span>
+                <span class="text-[10px] font-bold">Management</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+                <span class="material-symbols-outlined">notifications</span>
+                <span class="text-[10px] font-medium">Alerts</span>
+            </a>
+            <a class="flex flex-col items-center gap-1 text-slate-400 hover:text-primary transition-colors" href="#">
+                <span class="material-symbols-outlined">person</span>
+                <span class="text-[10px] font-medium">Profile</span>
+            </a>
+        </nav>
+    </div>
+</body>
+
+</html>

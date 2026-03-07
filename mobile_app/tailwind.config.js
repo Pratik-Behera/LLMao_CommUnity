@@ -1,0 +1,1 @@
+module.exports={content:["./app/**/*.{js,jsx,ts,tsx}","./components/**/*.{js,jsx,ts,tsx}"],presets:[require("nativewind/preset")],theme:{extend:{colors:{primary:"#3994ef",admin:"#4338ca","admin-dark":"#312e81","primary-orange":"#f97316","background-light":"#f6f7f8","background-dark":"#101922"},fontFamily:{display:["Plus Jakarta Sans","sans-serif"]}}}}

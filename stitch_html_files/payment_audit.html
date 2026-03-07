@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Payout Audit Log - CommUnity</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3994ef",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
+    <div
+        class="relative flex min-h-screen w-full flex-col max-w-[414px] mx-auto bg-white dark:bg-slate-900 shadow-xl overflow-x-hidden">
+        <!-- Header -->
+        <div
+            class="flex items-center bg-white dark:bg-slate-900 p-4 pb-2 justify-between sticky top-0 z-10 border-b border-slate-100 dark:border-slate-800">
+            <div
+                class="text-slate-900 dark:text-slate-100 flex size-10 shrink-0 items-center justify-center cursor-pointer">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </div>
+            <h2
+                class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center">
+                Payout History</h2>
+            <div
+                class="text-slate-900 dark:text-slate-100 flex size-10 shrink-0 items-center justify-center cursor-pointer">
+                <span class="material-symbols-outlined">file_download</span>
+            </div>
+        </div>
+        <!-- Tabs -->
+        <div class="bg-white dark:bg-slate-900">
+            <div class="flex border-b border-slate-100 dark:border-slate-800 px-4 gap-8">
+                <a class="flex flex-col items-center justify-center border-b-2 border-primary text-primary pb-3 pt-4"
+                    href="#">
+                    <p class="text-sm font-bold leading-normal">All Payouts</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-3 pt-4"
+                    href="#">
+                    <p class="text-sm font-bold leading-normal">Pending</p>
+                </a>
+                <a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-500 dark:text-slate-400 pb-3 pt-4"
+                    href="#">
+                    <p class="text-sm font-bold leading-normal">Flagged</p>
+                </a>
+            </div>
+        </div>
+        <!-- Search & Filter -->
+        <div class="px-4 py-4 space-y-3">
+            <label class="flex flex-col w-full">
+                <div class="flex w-full items-stretch rounded-xl h-11 bg-slate-100 dark:bg-slate-800">
+                    <div class="text-slate-500 dark:text-slate-400 flex items-center justify-center pl-4">
+                        <span class="material-symbols-outlined text-[20px]">search</span>
+                    </div>
+                    <input
+                        class="w-full border-none bg-transparent focus:ring-0 text-slate-900 dark:text-slate-100 placeholder:text-slate-500 dark:placeholder:text-slate-400 px-3 text-sm"
+                        placeholder="Search ID or Member" type="text" />
+                </div>
+            </label>
+            <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                <button
+                    class="flex h-8 shrink-0 items-center justify-center gap-x-1 rounded-lg bg-primary/10 text-primary px-3 border border-primary/20">
+                    <span class="text-xs font-semibold">Zone A</span>
+                    <span class="material-symbols-outlined text-[16px]">expand_more</span>
+                </button>
+                <button
+                    class="flex h-8 shrink-0 items-center justify-center gap-x-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3">
+                    <span class="text-xs font-semibold">Oct 2023</span>
+                    <span class="material-symbols-outlined text-[16px]">expand_more</span>
+                </button>
+                <button
+                    class="flex h-8 shrink-0 items-center justify-center gap-x-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-3">
+                    <span class="text-xs font-semibold">Grant Type</span>
+                    <span class="material-symbols-outlined text-[16px]">expand_more</span>
+                </button>
+            </div>
+        </div>
+        <!-- Audit Log List -->
+        <div class="flex-1 overflow-y-auto px-4 space-y-3 pb-24">
+            <!-- Item 1 -->
+            <div
+                class="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50 shadow-sm">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                            Flood Relief
+                        </span>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Oct 14, 2023 • 14:22</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-red-600 dark:text-red-400">-S$ 4,500</p>
+                        <span
+                            class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 mt-1">
+                            ZONE A
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-700/50">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
+                            SJ</div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-900 dark:text-slate-100">User #8821</p>
+                            <p class="text-[10px] text-slate-500 font-mono">OP-TX-9821-X</p>
+                        </div>
+                    </div>
+                    <button class="text-primary">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Item 2 -->
+            <div
+                class="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50 shadow-sm">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+                            Emergency Grant
+                        </span>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Oct 12, 2023 • 09:45</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-red-600 dark:text-red-400">-S$ 1,200</p>
+                        <span
+                            class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 mt-1">
+                            ZONE B
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-700/50">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs">
+                            ML</div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-900 dark:text-slate-100">User #4492</p>
+                            <p class="text-[10px] text-slate-500 font-mono">OP-TX-1029-A</p>
+                        </div>
+                    </div>
+                    <button class="text-primary">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Item 3 -->
+            <div
+                class="p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50 shadow-sm">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <span
+                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+                            Community Dev
+                        </span>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Oct 11, 2023 • 16:10</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-red-600 dark:text-red-400">-S$ 850</p>
+                        <span
+                            class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 mt-1">
+                            ZONE C
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-slate-50 dark:border-slate-700/50">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-xs">
+                            RK</div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-900 dark:text-slate-100">User #1105</p>
+                            <p class="text-[10px] text-slate-500 font-mono">OP-TX-3312-Z</p>
+                        </div>
+                    </div>
+                    <button class="text-primary">
+                        <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+            <!-- Item 4 (Flagged example) -->
+            <div
+                class="p-4 rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/10 shadow-sm">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <div class="flex items-center gap-1">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
+                                Urgent Relief
+                            </span>
+                            <span class="material-symbols-outlined text-red-600 text-[16px]">report</span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Oct 10, 2023 • 11:00</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-red-600 dark:text-red-400">-S$ 7,000</p>
+                        <span
+                            class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 mt-1">
+                            ZONE D
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-red-100 dark:border-red-900/20">
+                    <div class="flex items-center gap-2">
+                        <div
+                            class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold text-xs">
+                            TX</div>
+                        <div>
+                            <p class="text-xs font-semibold text-slate-900 dark:text-slate-100">User #9928</p>
+                            <p class="text-[10px] text-slate-500 font-mono">OP-TX-7711-Q</p>
+                        </div>
+                    </div>
+                    <button class="text-red-600 font-semibold text-xs">Review</button>
+                </div>
+            </div>
+        </div>
+        <!-- Bottom Navigation -->
+        <div
+            class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[414px] bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 px-4 pb-6 pt-2 z-20">
+            <div class="flex gap-2">
+                <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400"
+                    href="#">
+                    <div class="flex h-8 items-center justify-center">
+                        <span class="material-symbols-outlined">home</span>
+                    </div>
+                    <p class="text-[10px] font-medium leading-normal tracking-wide">Home</p>
+                </a>
+                <a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+                    <div class="flex h-8 items-center justify-center">
+                        <span class="material-symbols-outlined font-variation-settings-'FILL'1">settings</span>
+                    </div>
+                    <p class="text-[10px] font-medium leading-normal tracking-wide">Management</p>
+                </a>
+                <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400"
+                    href="#">
+                    <div class="flex h-8 items-center justify-center">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </div>
+                    <p class="text-[10px] font-medium leading-normal tracking-wide">Alerts</p>
+                </a>
+                <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-500 dark:text-slate-400"
+                    href="#">
+                    <div class="flex h-8 items-center justify-center">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                    <p class="text-[10px] font-medium leading-normal tracking-wide">Profile</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,148 @@
+import { mockPaymentEngine } from './PaymentEngine';
+import { triggerEngine } from './TriggerEngine';
+import { clickhouseService } from '../../backend/services/ClickHouseClient';
+
+// ─── Types ──────────────────────────────────────────────────────
+
+interface AuditLog {
+  alertId: string;
+  disbursementId: string;
+  amount: number;
+  status: string;
+  timestamp: string;
+  aiReasoning: string;
+  aiConfidence: number;
+  zone: string;
+}
+
+// ─── Distribution Engine ────────────────────────────────────────
+
+/**
+ * Production Distribution Engine.
+ * Handles fund disbursement logic, writes audit logs to both
+ * in-memory (for UI) and ClickHouse (for persistence/analytics).
+ */
+class DistributionEngine {
+  private auditLogs: AuditLog[] = [];
+  private fundPools = {
+    totalPool: 45000,
+    communityReserve: 35000,
+    emergencyReserve: 10000,
+  };
+
+  constructor() {
+    this.loadPersistedLogs();
+  }
+
+  private loadPersistedLogs() {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const saved = window.localStorage.getItem('comm_unity_audit_logs');
+        if (saved) this.auditLogs = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('[DistributionEngine] Failed to load logs from localStorage');
+    }
+  }
+
+  private persistLogs() {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('comm_unity_audit_logs', JSON.stringify(this.auditLogs));
+      }
+    } catch (e) {
+      console.warn('[DistributionEngine] Failed to save logs to localStorage');
+    }
+  }
+
+  /**
+   * Calculate disbursement amounts for an alert.
+   */
+  async calculateDisbursement(alertId: string, basePayout: number) {
+    console.log(`[DistributionEngine] Calculating for: ${alertId}`);
+    await new Promise(r => setTimeout(r, 1200));
+
+    const affectedUserCount = Math.floor(Math.random() * 20) + 5;
+    const totalDisbursement = parseFloat((affectedUserCount * basePayout).toFixed(2));
+
+    return {
+      alertId,
+      userCount: affectedUserCount,
+      payoutPerUser: basePayout,
+      totalDisbursement,
+    };
+  }
+
+  /**
+   * Execute payouts — writes to in-memory, localStorage, AND ClickHouse.
+   */
+  async executePayouts(alertId: string, amount: number) {
+    console.log(`[DistributionEngine] Executing Payouts for: ${alertId}`);
+
+    // Simulate payment authorization
+    const result = await mockPaymentEngine.authorizePayment(`DISB-${alertId}`);
+
+    // Fetch AI reasoning from TriggerEngine
+    const alerts = await triggerEngine.getActiveAlerts();
+    const currentAlert = alerts.find(a => a.id.startsWith('AI-') || a.id === alertId);
+
+    const disbursementId = `D-${Date.now()}`;
+    const auditLog: AuditLog = {
+      alertId,
+      disbursementId,
+      amount,
+      status: 'COMPLETED',
+      timestamp: new Date().toISOString(),
+      aiReasoning: currentAlert?.reasoning || 'Manual Triggered by Admin',
+      aiConfidence: currentAlert?.confidence || 100,
+      zone: currentAlert?.zone || 'Island-wide',
+    };
+
+    // Write to in-memory + localStorage
+    this.auditLogs.unshift(auditLog);
+    this.persistLogs();
+    this.fundPools.totalPool -= amount;
+
+    // Write to ClickHouse (fire-and-forget, don't block UI)
+    try {
+      await clickhouseService.insertDisbursement({
+        decision_id: '00000000-0000-0000-0000-000000000000', // Would be real UUID from trigger_decisions
+        amount,
+        recipient_count: Math.ceil(amount / 50),
+        status: 'COMPLETED',
+        payment_hash: disbursementId,
+        zone: currentAlert?.zone || 'Island-wide',
+      });
+      console.log(`[DistributionEngine] ClickHouse write successful: ${disbursementId}`);
+    } catch (e) {
+      console.warn('[DistributionEngine] ClickHouse write failed (non-blocking):', e);
+    }
+
+    return {
+      status: 'SUCCESSFUL',
+      summary: auditLog,
+      remainingPool: this.fundPools.totalPool,
+    };
+  }
+
+  /**
+   * Get all audit logs (from in-memory / localStorage for UI).
+   */
+  async getAuditLogs(): Promise<AuditLog[]> {
+    return this.auditLogs;
+  }
+
+  /**
+   * Get audit logs from ClickHouse (for persistent analytics).
+   */
+  async getClickHouseAuditLogs(limit: number = 20) {
+    try {
+      return await clickhouseService.getRecentDisbursements(limit);
+    } catch (e) {
+      console.warn('[DistributionEngine] ClickHouse query failed, falling back to in-memory');
+      return this.auditLogs;
+    }
+  }
+}
+
+export const mockDistributionEngine = new DistributionEngine();

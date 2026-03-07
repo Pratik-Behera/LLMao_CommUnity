@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>CommUnity Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3994ef",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+    <div
+        class="mx-auto min-h-screen max-w-[414px] bg-background-light dark:bg-background-dark flex flex-col shadow-2xl relative overflow-hidden">
+        <!-- Top Header -->
+        <header
+            class="flex items-center bg-white dark:bg-slate-900 p-4 pb-2 justify-between sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800">
+            <div class="flex size-10 shrink-0 items-center">
+                <div class="bg-primary/10 flex items-center justify-center rounded-full size-10 text-primary">
+                    <span class="material-symbols-outlined">shield_person</span>
+                </div>
+            </div>
+            <h2
+                class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center">
+                Admin Console</h2>
+            <div class="flex w-10 items-center justify-end">
+                <button
+                    class="flex items-center justify-center rounded-xl h-10 w-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+            </div>
+        </header>
+        <main class="flex-1 overflow-y-auto pb-24">
+            <!-- Key Metrics -->
+            <div class="flex flex-wrap gap-3 p-4">
+                <div
+                    class="flex min-w-[150px] flex-1 flex-col gap-1 rounded-xl p-5 bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Total
+                        Pool</p>
+                    <p class="text-slate-900 dark:text-slate-100 text-2xl font-bold leading-tight">S$ 142,500</p>
+                    <div class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-sm font-semibold">
+                        <span class="material-symbols-outlined text-sm">trending_up</span>
+                        <span>+5.2%</span>
+                    </div>
+                </div>
+                <div
+                    class="flex min-w-[150px] flex-1 flex-col gap-1 rounded-xl p-5 bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800">
+                    <p class="text-slate-500 dark:text-slate-400 text-xs font-medium uppercase tracking-wider">Members
+                    </p>
+                    <p class="text-slate-900 dark:text-slate-100 text-2xl font-bold leading-tight">1,284</p>
+                    <div class="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-sm font-semibold">
+                        <span class="material-symbols-outlined text-sm">person_add</span>
+                        <span>+12</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Fund Health Section -->
+            <div class="px-4 mb-4">
+                <div
+                    class="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <h3 class="text-slate-900 dark:text-slate-100 text-base font-bold mb-4">Fund Allocation Health</h3>
+                    <div class="flex h-4 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
+                        <div class="h-full bg-primary" style="width: 70%;"></div>
+                        <div class="h-full bg-amber-400" style="width: 20%;"></div>
+                        <div class="h-full bg-slate-400" style="width: 10%;"></div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="size-2 rounded-full bg-primary"></div>
+                                <span class="text-slate-600 dark:text-slate-400">Community Fund</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-slate-100">70% (S$ 99,750)</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="size-2 rounded-full bg-amber-400"></div>
+                                <span class="text-slate-600 dark:text-slate-400">Emergency Reserve</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-slate-100">20% (S$ 28,500)</span>
+                        </div>
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center gap-2">
+                                <div class="size-2 rounded-full bg-slate-400"></div>
+                                <span class="text-slate-600 dark:text-slate-400">Admin Operations</span>
+                            </div>
+                            <span class="font-bold text-slate-900 dark:text-slate-100">10% (S$ 14,250)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Live NEA Status -->
+            <div class="px-4 mb-4">
+                <div
+                    class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 p-4 rounded-xl flex items-center gap-4">
+                    <div class="bg-blue-500 text-white rounded-lg p-2 animate-pulse">
+                        <span class="material-symbols-outlined">radar</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-bold text-blue-900 dark:text-blue-100 uppercase tracking-tighter">
+                                Live NEA Status</h4>
+                            <span
+                                class="text-[10px] bg-blue-500 text-white px-2 py-0.5 rounded-full font-bold">MONITORING</span>
+                        </div>
+                        <p class="text-sm text-blue-700 dark:text-blue-300">Moderate Rain expected in Jurong. No
+                            immediate risk detected.</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Last Payout Summary -->
+            <div class="px-4 mb-6">
+                <div
+                    class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-slate-900 dark:text-slate-100 text-sm font-bold">Last Payout Summary</h3>
+                        <span class="text-xs text-slate-500">Oct 12, 2023</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-slate-50 dark:bg-slate-800 p-2 rounded-lg">
+                            <span class="material-symbols-outlined text-slate-600 dark:text-slate-400">payments</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Heavy Flood Assistance
+                            </p>
+                            <p class="text-xs text-slate-500">Bishan-Ang Mo Kio Sector</p>
+                        </div>
+                        <p class="text-base font-bold text-red-500">-S$ 12,400</p>
+                    </div>
+                </div>
+            </div>
+            <!-- CRITICAL ACTION: Simulate Trigger -->
+            <div class="px-4 pb-4">
+                <button
+                    class="w-full bg-red-600 hover:bg-red-700 text-white p-6 rounded-2xl shadow-lg shadow-red-200 dark:shadow-red-950/40 flex flex-col items-center justify-center gap-2 transition-transform active:scale-95">
+                    <span class="material-symbols-outlined text-4xl font-bold">emergency_share</span>
+                    <span class="text-xl font-black uppercase tracking-widest">Simulate Trigger</span>
+                    <span class="text-xs font-medium text-red-100 opacity-80 uppercase tracking-tighter">Demo Purpose
+                        Only • Instant Alert Dispatch</span>
+                </button>
+            </div>
+        </main>
+        <!-- Bottom Navigation Bar -->
+        <nav
+            class="fixed bottom-0 w-full max-w-[414px] border-t border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md px-4 pb-6 pt-2 flex justify-between items-center z-50">
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <span class="text-[10px] font-bold">Home</span>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+                <span class="material-symbols-outlined text-2xl">groups</span>
+                <span class="text-[10px] font-medium">Management</span>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+                <span class="material-symbols-outlined text-2xl">warning</span>
+                <span class="text-[10px] font-medium">Alerts</span>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400" href="#">
+                <span class="material-symbols-outlined text-2xl">account_circle</span>
+                <span class="text-[10px] font-medium">Profile</span>
+            </a>
+        </nav>
+    </div>
+</body>
+
+</html>

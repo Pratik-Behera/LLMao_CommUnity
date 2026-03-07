@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Monthly Contribution - CommUnity</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3994ef",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+    <style>
+        body {
+            min-height: 896px;
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex flex-col"
+    style="width: 414px; margin: 0 auto; position: relative; overflow-x: hidden;">
+    <!-- Header -->
+    <header
+        class="sticky top-0 z-10 bg-white dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="flex items-center p-4 justify-between mx-auto w-full max-w-[414px]">
+            <button
+                class="text-slate-900 dark:text-slate-100 flex size-10 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h1
+                class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight flex-1 text-center pr-10">
+                Monthly Contribution</h1>
+        </div>
+    </header>
+    <main class="flex-1 mx-auto w-full pb-32 max-w-[414px]">
+        <!-- Streak Achievement Card -->
+        <div class="p-4">
+            <div
+                class="flex flex-col items-stretch justify-start rounded-xl overflow-hidden shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                <div class="w-full bg-center bg-no-repeat aspect-[21/9] bg-cover relative"
+                    data-alt="Abstract blue and purple gradient background"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDBuvbN0jED1Ys9rtYPVAeCup_rN1SsapwKlOr3B0kHvVioNyBpPMHv1wQuK8I7D5F3X-ZMyYdiVKLb_qzPUnk6bayJI1ZIbh4vCzOH1YEPa_qnDuEubQQ-HZFTMfQ82b7LjS7vwIoOMdU3aYIW96hjiFTklYzyARulzeyqHW0uCUwzULV-qgl1OnDHN1b7ObS8Zwer44y_8lIOR2or5uTh7c0kSWzbn0-2x9c4YfaDKv3a1UcBi0pPi6PIyYo4CSCzWIbN8XzeLQ");'>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                    <div class="absolute bottom-3 left-4 flex items-center gap-2">
+                        <div class="bg-primary p-1.5 rounded-full text-white">
+                            <span class="material-symbols-outlined text-sm fill-icon">workspace_premium</span>
+                        </div>
+                        <span class="text-white text-xs font-bold uppercase tracking-wider">Achievement Locked</span>
+                    </div>
+                </div>
+                <div class="flex w-full grow flex-col items-stretch justify-center gap-1 p-4">
+                    <p class="text-primary text-xs font-bold uppercase tracking-wider">6 Month Streak</p>
+                    <p class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">
+                        Consistent Impact Maker</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Your monthly contributions have
+                        supported 12 families so far!</p>
+                </div>
+            </div>
+        </div>
+        <!-- Selection Section -->
+        <section class="px-4 py-2">
+            <h3 class="text-slate-900 dark:text-slate-100 text-base font-bold mb-3">Select Contribution Amount</h3>
+            <!-- Amount Presets -->
+            <div class="grid grid-cols-4 gap-3 mb-4">
+                <button
+                    class="flex flex-col items-center justify-center h-14 rounded-xl bg-primary text-white font-bold ring-2 ring-primary ring-offset-2 dark:ring-offset-background-dark">
+                    <span class="text-sm">S$1</span>
+                </button>
+                <button
+                    class="flex flex-col items-center justify-center h-14 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    <span class="text-sm">S$2</span>
+                </button>
+                <button
+                    class="flex flex-col items-center justify-center h-14 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    <span class="text-sm">S$5</span>
+                </button>
+                <button
+                    class="flex flex-col items-center justify-center h-14 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    <span class="text-sm">S$10</span>
+                </button>
+            </div>
+            <!-- Custom Input -->
+            <div class="relative group mb-6">
+                <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-slate-400 font-bold">
+                    S$
+                </div>
+                <input
+                    class="w-full pl-10 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-slate-900 dark:text-white font-semibold"
+                    placeholder="Enter custom amount" type="number" />
+            </div>
+            <!-- Live Bucket Preview -->
+            <div class="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-4 border border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="text-slate-900 dark:text-slate-100 text-sm font-bold">How your S$10.00 is split</h4>
+                    <span class="material-symbols-outlined text-slate-400 text-sm">info</span>
+                </div>
+                <!-- Progress Bar Split -->
+                <div class="flex h-3 w-full rounded-full overflow-hidden mb-6 bg-slate-200 dark:bg-slate-800">
+                    <div class="h-full bg-primary" style="width: 70%;"></div>
+                    <div class="h-full bg-primary/60" style="width: 20%;"></div>
+                    <div class="h-full bg-primary/30" style="width: 10%;"></div>
+                </div>
+                <!-- Bucket Details -->
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="size-2 rounded-full bg-primary"></div>
+                            <span class="text-slate-600 dark:text-slate-400 text-sm">Community Support (70%)</span>
+                        </div>
+                        <span class="text-slate-900 dark:text-slate-100 text-sm font-bold">S$7.00</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="size-2 rounded-full bg-primary/60"></div>
+                            <span class="text-slate-600 dark:text-slate-400 text-sm">Reserve Fund (20%)</span>
+                        </div>
+                        <span class="text-slate-900 dark:text-slate-100 text-sm font-bold">S$2.00</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="size-2 rounded-full bg-primary/30"></div>
+                            <span class="text-slate-600 dark:text-slate-400 text-sm">Admin &amp; Fees (10%)</span>
+                        </div>
+                        <span class="text-slate-900 dark:text-slate-100 text-sm font-bold">S$1.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <!-- Bottom Actions & Nav -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white dark:bg-background-dark border-t border-slate-200 dark:border-slate-800 z-20"
+        style="left: 50%; transform: translateX(-50%); width: 414px;">
+        <!-- Action Button -->
+        <div class="p-4 mx-auto max-w-[414px]">
+            <button
+                class="w-full bg-primary text-white h-14 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+                <span class="material-symbols-outlined fill-icon">account_balance_wallet</span>
+                <span>Pay Now with Open Payments</span>
+            </button>
+        </div>
+        <!-- Bottom Nav Bar -->
+        <nav class="flex gap-2 px-4 pb-6 pt-2 mx-auto max-w-[414px]">
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500"
+                href="#">
+                <span class="material-symbols-outlined text-2xl">home</span>
+                <p class="text-[10px] font-bold uppercase tracking-tight">Home</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500"
+                href="#">
+                <span class="material-symbols-outlined text-2xl">groups</span>
+                <p class="text-[10px] font-bold uppercase tracking-tight">Circles</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+                <span class="material-symbols-outlined text-2xl fill-icon">volunteer_activism</span>
+                <p class="text-[10px] font-bold uppercase tracking-tight">Contribute</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-400 dark:text-slate-500"
+                href="#">
+                <span class="material-symbols-outlined text-2xl">person</span>
+                <p class="text-[10px] font-bold uppercase tracking-tight">Profile</p>
+            </a>
+        </nav>
+    </div>
+</body>
+
+</html>

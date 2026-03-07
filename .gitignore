@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project Specific
+clickhouse_data/
+node_modules/
+mobile_app/node_modules/
+mobile_app/.expo/
+mobile_app/dist/
+tmp/
+*.sh
+.env

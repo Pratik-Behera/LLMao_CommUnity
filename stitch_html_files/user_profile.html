@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>CommUnity Profile</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3994ef",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+    <div
+        class="relative mx-auto h-[896px] w-[414px] bg-white dark:bg-background-dark overflow-hidden flex flex-col shadow-2xl">
+        <!-- Header -->
+        <div
+            class="flex items-center bg-white dark:bg-background-dark p-4 pb-2 justify-between border-b border-slate-100 dark:border-slate-800">
+            <div class="flex size-12 shrink-0 items-center justify-start text-primary">
+                <span class="material-symbols-outlined">settings</span>
+            </div>
+            <h2
+                class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">
+                Profile</h2>
+            <div class="flex w-12 items-center justify-end">
+                <button
+                    class="flex items-center justify-center rounded-xl h-12 bg-transparent text-slate-900 dark:text-slate-100">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+            </div>
+        </div>
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto pb-20 custom-scrollbar">
+            <!-- User Hero Section -->
+            <div class="flex p-6">
+                <div class="flex w-full flex-col gap-4 items-center">
+                    <div class="relative">
+                        <div class="bg-primary/10 aspect-square rounded-full min-h-32 w-32 flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-sm"
+                            data-alt="Professional male user profile avatar photo"
+                            style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBLKzM4lj1B8EQF_XgczkQeCe70ktEvY1CSROeI_whM6Wplkh8UGlpLsUXkLShy-g1ilDSpgFgEvqRr3YKqn_Sj86QSDglOB8WK_3Mkv3kLng7mt7QPSt3bwQTScUcNUI3D1dx-AzN48I5mm2rS4Pis9nPmroxXLBeM00TT0xEL3Kgpd4d8gY5ZCMhqf5YYoNtRgqcIoE5Nrd44W8j4kzGZyk3j_P_jnr3GhzJaUbyUYqftpoSGDkMi2IrQ__S4Ujwl_bd6KQSptQ"); background-size: cover;'>
+                        </div>
+                        <div
+                            class="absolute bottom-1 right-1 bg-primary text-white p-1 rounded-full border-2 border-white dark:border-slate-800 flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[16px]">edit</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center justify-center">
+                        <p
+                            class="text-slate-900 dark:text-slate-100 text-2xl font-bold leading-tight tracking-[-0.015em] text-center">
+                            Alex Johnson</p>
+                        <div class="mt-2 flex items-center gap-2">
+                            <span
+                                class="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Admin</span>
+                            <span class="text-slate-500 dark:text-slate-400 text-sm font-normal">Member since Jan
+                                2023</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Member Stats -->
+            <div class="flex flex-wrap gap-3 px-4 py-3">
+                <div
+                    class="flex min-w-[111px] flex-1 basis-[fit-content] flex-col gap-1 rounded-lg border border-slate-200 dark:border-slate-800 p-4 items-center text-center bg-white dark:bg-slate-900/50 shadow-sm">
+                    <p class="text-primary tracking-light text-2xl font-bold leading-tight">6</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase tracking-widest">
+                        Month Streak</p>
+                </div>
+                <div
+                    class="flex min-w-[111px] flex-1 basis-[fit-content] flex-col gap-1 rounded-lg border border-slate-200 dark:border-slate-800 p-4 items-center text-center bg-white dark:bg-slate-900/50 shadow-sm">
+                    <p class="text-primary tracking-light text-2xl font-bold leading-tight">12</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase tracking-widest">
+                        Active Circles</p>
+                </div>
+                <div
+                    class="flex min-w-[111px] flex-1 basis-[fit-content] flex-col gap-1 rounded-lg border border-slate-200 dark:border-slate-800 p-4 items-center text-center bg-white dark:bg-slate-900/50 shadow-sm">
+                    <p class="text-primary tracking-light text-2xl font-bold leading-tight">45</p>
+                    <p class="text-slate-500 dark:text-slate-400 text-[10px] font-semibold uppercase tracking-widest">
+                        Contributions</p>
+                </div>
+            </div>
+            <!-- Role Switch -->
+            <div class="px-4 py-4">
+                <button class="w-full flex items-center justify-between p-4 bg-primary text-white rounded-xl shadow-md">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined">admin_panel_settings</span>
+                        <span class="font-semibold text-sm">Switch to Member View</span>
+                    </div>
+                    <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
+            <!-- Personal Info Section -->
+            <div class="px-4 pt-6">
+                <h3 class="text-slate-900 dark:text-slate-100 text-sm font-bold uppercase tracking-widest px-1 pb-3">
+                    Personal Information</h3>
+                <div
+                    class="space-y-1 bg-white dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center justify-between p-4 border-b border-slate-50 dark:border-slate-800">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-slate-400">Full Name</span>
+                            <span class="text-sm font-medium">Alex Johnson</span>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4 border-b border-slate-50 dark:border-slate-800">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-slate-400">Email Address</span>
+                            <span class="text-sm font-medium">alex.j@community.app</span>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4 border-b border-slate-50 dark:border-slate-800">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-slate-400">Phone</span>
+                            <span class="text-sm font-medium">+1 (555) 012-3456</span>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
+                    </div>
+                    <div class="flex items-center justify-between p-4">
+                        <div class="flex flex-col">
+                            <span class="text-xs text-slate-400">Planning Area</span>
+                            <span class="text-sm font-medium">Downtown Metro</span>
+                        </div>
+                        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Account Settings Section -->
+            <div class="px-4 pt-8">
+                <h3 class="text-slate-900 dark:text-slate-100 text-sm font-bold uppercase tracking-widest px-1 pb-3">
+                    Account Settings</h3>
+                <div
+                    class="space-y-1 bg-white dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <div class="flex items-center gap-4 p-4 border-b border-slate-50 dark:border-slate-800">
+                        <div class="p-2 bg-primary/10 rounded-lg text-primary">
+                            <span class="material-symbols-outlined text-[20px]">notifications_active</span>
+                        </div>
+                        <span class="flex-1 text-sm font-medium">Notification Preferences</span>
+                        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 border-b border-slate-50 dark:border-slate-800">
+                        <div class="p-2 bg-primary/10 rounded-lg text-primary">
+                            <span class="material-symbols-outlined text-[20px]">lock</span>
+                        </div>
+                        <span class="flex-1 text-sm font-medium">Change Password</span>
+                        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
+                    </div>
+                    <div class="flex items-center gap-4 p-4">
+                        <div class="p-2 bg-primary/10 rounded-lg text-primary">
+                            <span class="material-symbols-outlined text-[20px]">shield</span>
+                        </div>
+                        <span class="flex-1 text-sm font-medium">Privacy Settings</span>
+                        <span class="material-symbols-outlined text-slate-300">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Logout Section -->
+            <div class="px-4 py-10">
+                <button
+                    class="w-full py-4 px-4 bg-slate-100 dark:bg-slate-800 text-red-500 font-bold rounded-xl flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined">logout</span>
+                    Logout
+                </button>
+                <p class="text-center text-slate-400 text-[10px] mt-6 uppercase tracking-tighter">CommUnity App Version
+                    2.4.0</p>
+            </div>
+        </div>
+        <!-- Bottom Navigation Bar -->
+        <div
+            class="absolute bottom-0 left-0 right-0 flex gap-2 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-background-dark px-4 pb-6 pt-2 z-50">
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500" href="#">
+                <div class="flex h-8 items-center justify-center">
+                    <span class="material-symbols-outlined">home</span>
+                </div>
+                <p class="text-[10px] font-bold leading-normal tracking-wide uppercase">Home</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500" href="#">
+                <div class="flex h-8 items-center justify-center">
+                    <span class="material-symbols-outlined">group</span>
+                </div>
+                <p class="text-[10px] font-bold leading-normal tracking-wide uppercase">Circles</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500" href="#">
+                <div class="flex h-8 items-center justify-center">
+                    <span class="material-symbols-outlined">add_circle</span>
+                </div>
+                <p class="text-[10px] font-bold leading-normal tracking-wide uppercase">Contribute</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-slate-400 dark:text-slate-500" href="#">
+                <div class="flex h-8 items-center justify-center">
+                    <span class="material-symbols-outlined">verified_user</span>
+                </div>
+                <p class="text-[10px] font-bold leading-normal tracking-wide uppercase">Safety</p>
+            </a>
+            <a class="flex flex-1 flex-col items-center justify-end gap-1 text-primary" href="#">
+                <div class="flex h-8 items-center justify-center">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+                </div>
+                <p class="text-[10px] font-bold leading-normal tracking-wide uppercase">Profile</p>
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

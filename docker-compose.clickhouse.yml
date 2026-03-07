@@ -1,0 +1,27 @@
+version: '3.11'
+
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: community_clickhouse
+    ports:
+      - "8123:8123" # HTTP interface (for queries & dashboard)
+      - "9000:9000" # Native TCP interface (for client SDK)
+    volumes:
+      - ./clickhouse_data:/var/lib/clickhouse
+      - ./clickhouse/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      CLICKHOUSE_DB: community
+      CLICKHOUSE_USER: community_admin
+      CLICKHOUSE_PASSWORD: comm_unity_2026
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "clickhouse-client", "--query", "SELECT 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

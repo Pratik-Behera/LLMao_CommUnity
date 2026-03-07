@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>CommUnity - Join Your Neighborhood</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3994ef",
+                        "primary-orange": "#f97316",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark min-h-screen transition-colors duration-300 flex items-center justify-center bg-slate-200 dark:bg-slate-950">
+    <!-- PWA Style Container -->
+    <div class="relative flex h-[896px] w-[414px] flex-col mx-auto bg-white dark:bg-slate-900 shadow-xl overflow-y-auto overflow-x-hidden"
+        style="background-image: radial-gradient(#3994ef22 1px, transparent 1px); background-size: 20px 20px;">
+        <!-- Top Bar Navigation -->
+        <div
+            class="flex items-center justify-between p-4 sticky top-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md z-10">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white">
+                    <span class="material-symbols-outlined text-2xl" style="">shield</span>
+                </div>
+                <h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight" style="">
+                    CommUnity</h2>
+            </div>
+            <button
+                class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors"
+                onclick="document.documentElement.classList.toggle('dark')" style="">
+                <span class="material-symbols-outlined" data-icon="light_mode" style="">light_mode</span>
+            </button>
+        </div>
+        <!-- Hero Section -->
+        <div class="px-6 pt-10 pb-6">
+            <h1 class="text-slate-900 dark:text-slate-100 text-[36px] font-extrabold leading-tight tracking-tight"
+                style="">CommUnity</h1>
+            <p class="text-slate-600 dark:text-slate-400 text-lg font-normal mt-3 leading-relaxed" style="">Empowering
+                neighborhoods, together.</p>
+        </div>
+        <div class="px-6 py-4 flex justify-center opacity-80 dark:opacity-60">
+            <svg class="text-primary" fill="none" height="120" viewbox="0 0 200 120" width="200"
+                xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="60" r="30" stroke="currentColor" stroke-dasharray="4 4" stroke-width="2"></circle>
+                <circle cx="140" cy="60" r="30" stroke="currentColor" stroke-dasharray="4 4" stroke-width="2"></circle>
+                <circle cx="100" cy="40" r="30" stroke="currentColor" stroke-dasharray="4 4" stroke-width="2"></circle>
+                <path d="M80 80C80 80 90 70 100 70C110 70 120 80 120 80" stroke="currentColor" stroke-linecap="round"
+                    stroke-width="3"></path>
+                <path d="M70 90C70 90 85 85 100 85C115 85 130 90 130 90" stroke="currentColor" stroke-linecap="round"
+                    stroke-width="2"></path>
+                <path d="M100 30V20M135 45L145 35M65 45L55 35" stroke="currentColor" stroke-linecap="round"
+                    stroke-width="2"></path>
+                <text class="fill-slate-400 dark:fill-slate-500 text-[10px] font-bold uppercase tracking-widest"
+                    text-anchor="middle" x="50%" y="110">Together as one</text>
+            </svg>
+        </div>
+        <!-- Form Section -->
+        <div class="flex flex-col gap-6 px-6 pb-12">
+            <button
+                class="w-full h-20 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-xl shadow-lg shadow-primary/20 transition-all flex flex-col items-center justify-center"
+                style="">
+                <span class="" style="">I'm a Member</span>
+                <span class="text-xs font-normal opacity-80 mt-1" style="">Access your local community</span>
+            </button>
+            <button
+                class="w-full h-20 bg-white dark:bg-slate-800 border-2 border-primary/20 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl font-bold text-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex flex-col items-center justify-center"
+                style="">
+                <span class="" style="">I'm an Admin</span>
+                <span class="text-xs font-normal text-slate-500 dark:text-slate-400 mt-1" style="">Manage your
+                    neighborhood</span>
+            </button><button
+                class="w-full h-20 bg-transparent border-2 border-primary-orange text-primary-orange rounded-xl font-bold text-xl hover:bg-orange-50 dark:hover:bg-orange-900/10 transition-all flex flex-col items-center justify-center">
+                <span class="">Select Location</span>
+                <span class="text-xs font-normal opacity-80 mt-1">Find your area manually</span>
+            </button>
+        </div>
+        <!-- Footer / Image Decor -->
+        <div class="mt-auto px-6 pb-12 text-center border-t border-slate-100 dark:border-slate-800 pt-8">
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400">
+                    <span class="material-symbols-outlined text-lg" style="">verified_user</span>
+                    <p class="text-sm font-medium" style="">Powered By Open Payments</p>
+                </div>
+                <div class="flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400">
+                    <span class="material-symbols-outlined text-lg" style="">admin_panel_settings</span>
+                    <p class="text-sm font-medium" style="">Member flow powered by OTP</p>
+                </div>
+            </div>
+            <p class="mt-8 text-[10px] text-slate-400 dark:text-slate-600 uppercase tracking-[0.2em] font-bold"
+                style="">
+                By continuing, you agree to our Terms &amp; Privacy Policy
+            </p>
+        </div>
+        <!-- Safe Area Spacer for PWA/Mobile -->
+        <div class="h-6 bg-white dark:bg-slate-900"></div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#3994ef",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Plus Jakarta Sans", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        .confetti-overlay {
+            background-image: radial-gradient(circle, #3994ef 1px, transparent 1px), radial-gradient(circle, #10b981 1px, transparent 1px), radial-gradient(circle, #f59e0b 1px, transparent 1px);
+            background-size: 20px 20px, 30px 30px, 25px 25px;
+            background-position: 0 0, 10px 10px, 5px 15px;
+            opacity: 0.2;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background-light dark:bg-background-dark font-display flex justify-center items-center min-h-screen">
+    <!-- Mobile Frame 414x896 -->
+    <div class="relative w-[414px] h-[896px] bg-white dark:bg-slate-900 shadow-2xl overflow-hidden flex flex-col">
+        <!-- Confetti Background Layer -->
+        <div class="absolute inset-0 confetti-overlay pointer-events-none"></div>
+        <!-- Top AppBar -->
+        <div class="relative z-10 flex items-center justify-between p-6">
+            <button
+                class="text-slate-900 dark:text-slate-100 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                <span class="material-symbols-outlined block">close</span>
+            </button>
+            <h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold">Payment Status</h2>
+            <div class="w-10"></div> <!-- Spacer for alignment -->
+        </div>
+        <div class="relative z-10 flex-1 flex flex-col items-center px-6 pt-10">
+            <!-- Celebratory Icon -->
+            <div class="mb-8 relative">
+                <div class="absolute inset-0 bg-emerald-500/20 blur-2xl rounded-full scale-150"></div>
+                <div
+                    class="relative bg-emerald-500 text-white w-24 h-24 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/40">
+                    <span class="material-symbols-outlined !text-6xl font-bold">check</span>
+                </div>
+            </div>
+            <!-- Amount & Message -->
+            <h1 class="text-slate-900 dark:text-slate-100 text-5xl font-extrabold tracking-tight mb-2">S$10.00</h1>
+            <p class="text-slate-500 dark:text-slate-400 text-lg font-medium text-center">Funds received via Open
+                Payments</p>
+            <!-- Transaction Details Card -->
+            <div
+                class="w-full mt-12 bg-background-light dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-200/50 dark:border-slate-700/50">
+                <h3 class="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest mb-6">
+                    Transaction Details</h3>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-xl">location_on</span>
+                            </div>
+                            <span class="text-slate-600 dark:text-slate-300 font-medium">Zone</span>
+                        </div>
+                        <span class="text-slate-900 dark:text-slate-100 font-bold">Brooklyn Heights</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-xl">receipt_long</span>
+                            </div>
+                            <span class="text-slate-600 dark:text-slate-300 font-medium">Transaction ID</span>
+                        </div>
+                        <span class="text-slate-900 dark:text-slate-100 font-mono font-medium">OP-HK77-9201-X</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                <span class="material-symbols-outlined text-xl">schedule</span>
+                            </div>
+                            <span class="text-slate-600 dark:text-slate-300 font-medium">Timestamp</span>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-slate-900 dark:text-slate-100 font-bold">Oct 12, 2023</div>
+                            <div class="text-slate-500 dark:text-slate-400 text-sm">14:30 SGT</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full mt-6 flex justify-center items-center gap-2">
+                <span class="size-2 bg-emerald-500 rounded-full"></span>
+                <span
+                    class="text-xs font-bold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/80 px-3 py-1.5 rounded-full">Payment
+                    Verified</span>
+            </div>
+            <!-- Visualization Component -->
+        </div>
+        <!-- Action Buttons -->
+        <div class="relative z-10 p-6 space-y-4 pb-12">
+            <button
+                class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all active:scale-95">
+                <span class="material-symbols-outlined">share</span>
+                Share Receipt
+            </button>
+            <button
+                class="w-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold py-4 rounded-xl transition-all active:scale-95">
+                Back to Home
+            </button>
+        </div>
+    </div>
+</body>
+
+</html>
