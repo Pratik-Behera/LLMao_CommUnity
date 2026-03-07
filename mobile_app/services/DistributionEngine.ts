@@ -1,6 +1,6 @@
 import { mockPaymentEngine } from './PaymentEngine';
 import { triggerEngine } from './TriggerEngine';
-import { clickhouseService } from '../../backend/services/ClickHouseClient';
+import { clickhouseService } from './ClickHouseClient';
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -13,6 +13,7 @@ interface AuditLog {
   aiReasoning: string;
   aiConfidence: number;
   zone: string;
+  severities?: Record<string, number>;
 }
 
 // ─── Distribution Engine ────────────────────────────────────────
@@ -23,7 +24,31 @@ interface AuditLog {
  * in-memory (for UI) and ClickHouse (for persistence/analytics).
  */
 class DistributionEngine {
-  private auditLogs: AuditLog[] = [];
+  private auditLogs: AuditLog[] = [
+    {
+      alertId: "AI-PREC-091",
+      disbursementId: "D-9921",
+      amount: 450,
+      status: "COMPLETED",
+      timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+      aiReasoning: "Localized PSI spike in West Singapore (185) with low visibility. AI recommended immediate mask subsidy disbursement.",
+      aiConfidence: 94,
+      zone: "West",
+      severities: { west: 85, central: 40, north: 35, south: 30, east: 25 }
+    },
+    {
+      alertId: "AI-PREC-088",
+      disbursementId: "D-9915",
+      amount: 1200,
+      status: "COMPLETED",
+      timestamp: new Date(Date.now() - 86400000).toISOString(), // 24 hours ago
+      aiReasoning: "Island-wide rainfall forecast exceeding 50mm/h. High correlation with past flash flood trigger patterns.",
+      aiConfidence: 89,
+      zone: "Island-wide",
+      severities: { west: 65, central: 75, north: 80, south: 70, east: 60 }
+    }
+  ];
+
   private fundPools = {
     totalPool: 45000,
     communityReserve: 35000,
@@ -38,7 +63,16 @@ class DistributionEngine {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
         const saved = window.localStorage.getItem('comm_unity_audit_logs');
-        if (saved) this.auditLogs = JSON.parse(saved);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Merge with demo logs, keeping uniqueness by disbursementId
+            const existingIds = new Set(this.auditLogs.map(l => l.disbursementId));
+            parsed.forEach((l: AuditLog) => {
+                if (!existingIds.has(l.disbursementId)) this.auditLogs.push(l);
+            });
+            // Sort by timestamp desc
+            this.auditLogs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        }
       }
     } catch (e) {
       console.warn('[DistributionEngine] Failed to load logs from localStorage');
@@ -96,6 +130,7 @@ class DistributionEngine {
       aiReasoning: currentAlert?.reasoning || 'Manual Triggered by Admin',
       aiConfidence: currentAlert?.confidence || 100,
       zone: currentAlert?.zone || 'Island-wide',
+      severities: currentAlert?.severities,
     };
 
     // Write to in-memory + localStorage
@@ -137,11 +172,21 @@ class DistributionEngine {
    */
   async getClickHouseAuditLogs(limit: number = 20) {
     try {
-      return await clickhouseService.getRecentDisbursements(limit);
+      const dbLogs = await clickhouseService.getRecentDisbursements(limit);
+      if (dbLogs.length > 0) return dbLogs;
+      return this.auditLogs;
     } catch (e) {
       console.warn('[DistributionEngine] ClickHouse query failed, falling back to in-memory');
       return this.auditLogs;
     }
+  }
+
+  /**
+   * Returns current fund health health
+   * Ref: cursor_docs/api_documentation.md
+   */
+  async getFundHealth() {
+      return this.fundPools;
   }
 }
 

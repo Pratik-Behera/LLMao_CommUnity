@@ -49,6 +49,13 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="audit"
+        options={{
+          title: 'Audit',
+          tabBarIcon: ({ color }) => <MaterialIcons name="security" size={24} color={color} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',

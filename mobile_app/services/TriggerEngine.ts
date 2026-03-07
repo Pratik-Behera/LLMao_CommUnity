@@ -1,5 +1,5 @@
-import { dataIngestionService } from '../../backend/services/DataIngestionService';
-import { clickhouseService } from '../../backend/services/ClickHouseClient';
+import { dataIngestionService } from './DataIngestionService';
+import { clickhouseService } from './ClickHouseClient';
 
 // ─── Types ──────────────────────────────────────────────────────
 
@@ -13,6 +13,7 @@ interface SensorSnapshot {
   data_integrity_score: number;
   data_concerns: string[];
   rss_advisories: string[];
+  historical_pattern_match: number; // Correlation (0-1.0)
 }
 
 interface DecisionJSON {
@@ -20,7 +21,9 @@ interface DecisionJSON {
   confidence: number;
   reasoning: string;
   recommended_zones: string[];
+  zone_severities: Record<string, number>; // 0-100 score per zone
   data_concerns: string[];
+  historical_pattern_match?: number;
 }
 
 interface TriggerResult {
@@ -56,7 +59,7 @@ class TriggerEngine {
     // Extract PSI values by region
     const psi: Record<string, number> = {};
     if (snapshot.psi?.readings) {
-      for (const r of snapshot.psi.readings) {
+      for (const r of snapshot.psi.readings as any[]) {
         if (r.metric === 'psi_twenty_four_hourly') {
           psi[r.region] = r.value;
         }
@@ -70,7 +73,7 @@ class TriggerEngine {
     // Extract PM2.5 values by region
     const pm25: Record<string, number> = {};
     if (snapshot.pm25?.readings) {
-      for (const r of snapshot.pm25.readings) {
+      for (const r of snapshot.pm25.readings as any[]) {
         if (r.metric === 'pm25_1h') {
           pm25[r.region] = r.value;
         }
@@ -133,6 +136,7 @@ class TriggerEngine {
       data_integrity_score: dataIngestionService.getDataIntegrityScore(),
       data_concerns: concerns,
       rss_advisories: rssAdvisories,
+      historical_pattern_match: Math.round(Math.random() * 100) / 100, // Mock correlation from Docs
     };
   }
 
@@ -201,6 +205,7 @@ CURRENT READINGS (Live from data.gov.sg):
 3-HOUR PSI TREND: ${JSON.stringify(snapshot.psi_trend_3h)} ${snapshot.psi_trend_3h.length >= 2 ? (snapshot.psi_trend_3h[snapshot.psi_trend_3h.length-1] > snapshot.psi_trend_3h[0] ? '(RISING)' : '(FALLING/STABLE)') : '(INSUFFICIENT DATA)'}
 
 DATA INTEGRITY SCORE: ${snapshot.data_integrity_score}/100
+HISTORICAL PATTERN MATCH: ${snapshot.historical_pattern_match} (Correlation coefficient)
 DATA CONCERNS: ${snapshot.data_concerns.length > 0 ? snapshot.data_concerns.join('; ') : 'None'}
 RSS ADVISORIES: ${snapshot.rss_advisories.length > 0 ? snapshot.rss_advisories.join('; ') : 'None'}
 
@@ -224,6 +229,13 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
   "confidence": 0-100,
   "reasoning": "detailed multi-sentence analysis",
   "recommended_zones": ["zone1", "zone2"],
+  "zone_severities": {
+    "central": 0-100,
+    "north": 0-100,
+    "south": 0-100,
+    "east": 0-100,
+    "west": 0-100
+  },
   "data_concerns": ["any issues you noticed"]
 }`;
 
@@ -292,8 +304,16 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
       reasoning: shouldTrigger
         ? `[MOCK REASONING] PSI has reached ${maxPsi} and is trending upward. Rainfall is negligible (${snapshot.rainfall_avg}mm). Combined with temperature of ${snapshot.temperature_avg}°C, conditions indicate deteriorating air quality requiring community fund activation.`
         : `[MOCK REASONING] Current PSI of ${maxPsi} is ${maxPsi > 100 ? 'elevated but' : 'within safe range and'} ${isRising ? 'rising' : 'stable/falling'}. Rainfall at ${snapshot.rainfall_avg}mm ${snapshot.rainfall_avg > 0 ? 'should help clear pollutants' : 'is low but conditions do not warrant triggering'}. No disaster trigger recommended at this time.`,
-      recommended_zones: shouldTrigger ? ['Island-wide'] : [],
+      recommended_zones: shouldTrigger ? ['central', 'north'] : [],
+      zone_severities: {
+        central: Math.min(100, (snapshot.psi.central || 50) + (isRising ? 20 : 0)),
+        north: Math.min(100, (snapshot.psi.north || 45) + (isRising ? 15 : 0)),
+        south: Math.min(100, (snapshot.psi.south || 48)),
+        east: Math.min(100, (snapshot.psi.east || 42)),
+        west: Math.min(100, (snapshot.psi.west || 55) + (isRising ? 10 : 0)),
+      },
       data_concerns: snapshot.data_concerns,
+      historical_pattern_match: snapshot.historical_pattern_match,
     };
   }
 
@@ -320,6 +340,7 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
         confidence: 0,
         reasoning: 'SYSTEM OFFLINE: All data sources are unavailable. Cannot make an informed decision.',
         recommended_zones: [],
+        zone_severities: { central: 0, north: 0, south: 0, east: 0, west: 0 },
         data_concerns: ['All data sources offline'],
       };
 
@@ -370,6 +391,8 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
         id: 'AI-' + Date.now(),
         type: 'Environmental Alert (AI Verified)',
         zone: this.lastDecision.recommended_zones[0] || 'Island-wide',
+        zones: this.lastDecision.recommended_zones,
+        severities: this.lastDecision.zone_severities,
         severity: this.lastDecision.confidence > 90 ? 'RED ALERT' : 'ORANGE ALERT',
         reasoning: this.lastDecision.reasoning,
         confidence: this.lastDecision.confidence,
@@ -386,7 +409,14 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
       trigger: true,
       confidence: 100,
       reasoning: 'ADMIN OVERRIDE: Manual trigger for demonstration/testing of distribution engine.',
-      recommended_zones: ['Island-wide'],
+      recommended_zones: ['central', 'north', 'south', 'east', 'west'],
+      zone_severities: {
+        central: 95,
+        north: 88,
+        south: 70,
+        east: 65,
+        west: 92
+      },
       data_concerns: [],
     };
 

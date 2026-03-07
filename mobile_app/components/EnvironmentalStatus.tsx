@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { dataIngestionService } from '../../backend/services/DataIngestionService';
+import { dataIngestionService } from '../services/DataIngestionService';
 
 export default function EnvironmentalStatus() {
   const [snapshot, setSnapshot] = useState<any>(null);

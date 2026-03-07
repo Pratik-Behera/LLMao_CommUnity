@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import '../global.css';
 import { AuthProvider } from '../services/AuthService';
-import { dataIngestionService } from '../../backend/services/DataIngestionService';
+import { dataIngestionService } from '../services/DataIngestionService';
 
 export default function RootLayout() {
   useEffect(() => {
