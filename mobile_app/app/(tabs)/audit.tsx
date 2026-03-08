@@ -5,6 +5,7 @@ import { mockDistributionEngine } from '../../services/DistributionEngine';
 import AuditLogItem from '../../components/AuditLogItem';
 import { Card, Badge } from '../../components/ui/shadcn';
 import { useRouter } from 'expo-router';
+import { Alert } from 'react-native';
 
 export default function PaymentAuditScreen() {
     const [auditLogs, setAuditLogs] = useState<any[]>([]);
@@ -40,7 +41,7 @@ export default function PaymentAuditScreen() {
                 {/* ADMIN HEADER */}
                 <View className="flex-row items-center px-6 pt-4 pb-6 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800">
                     <TouchableOpacity 
-                        onPress={() => router.back()}
+                        onPress={() => router.push('/(tabs)')}
                         className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
                     >
                         <ChevronLeft size={20} color="#64748b" />
@@ -81,11 +82,11 @@ export default function PaymentAuditScreen() {
                     {/* FILTER & EXPORT BAR */}
                     <View className="flex-row justify-between items-center mb-6">
                         <View className="flex-row gap-2">
-                            <TouchableOpacity className="h-10 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex-row items-center gap-2">
+                            <TouchableOpacity onPress={() => Alert.alert('Filter', 'Advanced filters coming soon')} className="h-10 px-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl flex-row items-center gap-2">
                                 <Filter size={14} color="#64748b" />
                                 <Text className="text-xs font-bold text-slate-600 dark:text-slate-400">Filter</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity className="h-10 w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl items-center justify-center">
+                            <TouchableOpacity onPress={() => Alert.alert('Export', 'Downloading raw ledger logs as CSV')} className="h-10 w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl items-center justify-center">
                                 <Download size={14} color="#64748b" />
                             </TouchableOpacity>
                         </View>

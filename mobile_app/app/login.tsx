@@ -1,85 +1,234 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, TextInput, SafeAreaView, ImageBackground, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
-import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, SafeAreaView, Dimensions, StyleSheet } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAuth } from '../services/AuthService';
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { setRole } = useAuth();
   const { height } = Dimensions.get('window');
 
+  const handleMember = () => {
+    setRole('Member');
+    router.replace('/(tabs)');
+  };
+
+  const handleOwner = () => {
+    setRole('Admin');
+    router.replace('/(tabs)');
+  };
+
   return (
-    <View className="flex-1 bg-slate-900">
-      <ImageBackground 
-        source={{ uri: 'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2000' }}
-        className="flex-1"
-        style={{ height: height * 0.4 }}
-      >
-        <LinearGradient
-          colors={['transparent', '#0f172a']}
-          className="flex-1 justify-end p-8"
-        >
-          <View className="items-center mb-8">
-            <View className="h-20 w-20 bg-primary rounded-3xl items-center justify-center shadow-2xl shadow-primary/50 rotate-12">
-              <MaterialIcons name="volunteer-activism" size={40} color="white" />
-            </View>
-            <Text className="text-4xl font-black text-white mt-6 tracking-tighter">CommUnity</Text>
-            <Text className="text-slate-400 font-medium tracking-wide">Programmable Trust. Real-time Impact.</Text>
-          </View>
-        </LinearGradient>
-      </ImageBackground>
+    <View style={styles.root}>
+      <LinearGradient
+        colors={['#0f172a', '#1e3a5f', '#0f172a']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
 
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1 bg-slate-900 px-8 pt-4"
-      >
-        <Text className="text-white text-2xl font-bold mb-2">Welcome Back</Text>
-        <Text className="text-slate-400 mb-8">Sign in to manage your community fund</Text>
+      {/* Decorative radial glow */}
+      <View style={styles.glowCircle} />
 
-        {/* Input Fields */}
-        <View className="gap-4">
-          <View className="flex-row items-center bg-slate-800/50 border border-slate-700/50 rounded-2xl px-4 h-16">
-            <MaterialIcons name="phone" size={20} color="#94a3b8" className="mr-3" />
-            <TextInput 
-              placeholder="Phone Number"
-              placeholderTextColor="#64748b"
-              keyboardType="phone-pad"
-              className="flex-1 text-white font-medium h-12 outline-none"
-            />
+      <SafeAreaView style={styles.container}>
+        {/* Logo & Branding */}
+        <View style={styles.brandArea}>
+          <View style={styles.logoOuter}>
+            <LinearGradient
+              colors={['#3b82f6', '#6366f1']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.logoGradient}
+            >
+              <MaterialIcons name="volunteer-activism" size={44} color="white" />
+            </LinearGradient>
           </View>
 
-          <TouchableOpacity 
-            onPress={() => router.replace('/(tabs)')}
-            className="bg-primary h-16 rounded-2xl items-center justify-center shadow-lg shadow-primary/30 mt-2"
-          >
-            <Text className="text-white font-bold text-lg">Send Verification Code</Text>
+          <Text style={styles.appName}>CommUnity</Text>
+          <Text style={styles.tagline}>Programmable Trust · Real-time Impact</Text>
+
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>SELECT YOUR ROLE</Text>
+            <View style={styles.dividerLine} />
+          </View>
+        </View>
+
+        {/* Two Role Buttons */}
+        <View style={styles.buttonArea}>
+          {/* Member Button */}
+          <TouchableOpacity onPress={handleMember} activeOpacity={0.85} style={styles.buttonWrapper}>
+            <LinearGradient
+              colors={['#3b82f6', '#2563eb']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.button}
+            >
+              <View style={styles.iconCircle}>
+                <MaterialIcons name="people" size={28} color="#3b82f6" />
+              </View>
+              <View style={styles.buttonTextArea}>
+                <Text style={styles.buttonTitle}>I'm a Member</Text>
+                <Text style={styles.buttonSub}>View dashboard, request aid & contribute</Text>
+              </View>
+              <MaterialIcons name="arrow-forward-ios" size={16} color="rgba(255,255,255,0.7)" />
+            </LinearGradient>
+          </TouchableOpacity>
+
+          {/* Owner / Admin Button */}
+          <TouchableOpacity onPress={handleOwner} activeOpacity={0.85} style={styles.buttonWrapper}>
+            <LinearGradient
+              colors={['#6366f1', '#4338ca']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.button}
+            >
+              <View style={[styles.iconCircle, { backgroundColor: 'rgba(99,102,241,0.15)' }]}>
+                <MaterialIcons name="admin-panel-settings" size={28} color="#6366f1" />
+              </View>
+              <View style={styles.buttonTextArea}>
+                <Text style={styles.buttonTitle}>I'm an Owner</Text>
+                <Text style={styles.buttonSub}>Manage circles, run AI diagnostics & approve</Text>
+              </View>
+              <MaterialIcons name="arrow-forward-ios" size={16} color="rgba(255,255,255,0.7)" />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        {/* Divider */}
-        <View className="flex-row items-center my-8">
-          <View className="flex-1 h-[1px] bg-slate-800" />
-          <Text className="mx-4 text-slate-500 font-bold text-xs uppercase" style={{ letterSpacing: 1 }}>OR</Text>
-          <View className="flex-1 h-[1px] bg-slate-800" />
+        {/* Footer */}
+        <View style={styles.footer}>
+          <MaterialIcons name="lock" size={12} color="#475569" />
+          <Text style={styles.footerText}>Secured by Interledger Protocol</Text>
         </View>
-
-        {/* Social Logins */}
-        <View className="flex-row gap-4">
-          <TouchableOpacity 
-            onPress={() => router.replace('/(tabs)')}
-            className="flex-1 flex-row items-center justify-center bg-white h-14 rounded-2xl gap-3"
-          >
-            <FontAwesome5 name="google" size={18} color="#ea4335" />
-            <Text className="font-bold text-slate-900">Google</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View className="mt-8 mb-10 items-center">
-            <Text className="text-slate-500 text-sm">
-                Don't have an account? <Text className="text-primary font-bold">Join Community</Text>
-            </Text>
-        </View>
-      </KeyboardAvoidingView>
+      </SafeAreaView>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: '#0f172a',
+  },
+  glowCircle: {
+    position: 'absolute',
+    width: 400,
+    height: 400,
+    borderRadius: 200,
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+    top: -100,
+    alignSelf: 'center',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+  },
+  brandArea: {
+    alignItems: 'center',
+    marginBottom: 48,
+  },
+  logoOuter: {
+    marginBottom: 24,
+    shadowColor: '#3b82f6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 24,
+    elevation: 20,
+  },
+  logoGradient: {
+    height: 80,
+    width: 80,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    transform: [{ rotate: '12deg' }],
+  },
+  appName: {
+    fontSize: 42,
+    fontWeight: '900',
+    color: '#ffffff',
+    letterSpacing: -2,
+    marginBottom: 6,
+  },
+  tagline: {
+    fontSize: 14,
+    color: '#94a3b8',
+    fontWeight: '500',
+    letterSpacing: 0.5,
+    marginBottom: 32,
+  },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    gap: 12,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#1e293b',
+  },
+  dividerText: {
+    color: '#475569',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 2,
+  },
+  buttonArea: {
+    gap: 16,
+    paddingHorizontal: 4,
+  },
+  buttonWrapper: {
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    gap: 14,
+  },
+  iconCircle: {
+    height: 52,
+    width: 52,
+    borderRadius: 16,
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonTextArea: {
+    flex: 1,
+  },
+  buttonTitle: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: '800',
+    marginBottom: 3,
+  },
+  buttonSub: {
+    color: 'rgba(255,255,255,0.65)',
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 48,
+  },
+  footerText: {
+    color: '#475569',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+});

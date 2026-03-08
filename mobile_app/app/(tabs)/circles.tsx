@@ -2,6 +2,8 @@ import { View, Text, ScrollView, TextInput, TouchableOpacity, SafeAreaView } fro
 import { MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '../../services/AuthService';
 import EnvironmentalStatus from '../../components/EnvironmentalStatus';
+import { Alert } from 'react-native';
+import { useRouter } from 'expo-router';
 
 export default function CirclesScreen() {
   const { isAdmin } = useAuth();
@@ -10,6 +12,7 @@ export default function CirclesScreen() {
   const primaryTextClass = isAdmin ? 'text-admin' : 'text-primary';
   const primaryBorderClass = isAdmin ? 'border-admin/20' : 'border-primary/10';
   const primaryBgClass = isAdmin ? 'bg-admin/5' : 'bg-primary/5';
+  const router = useRouter();
 
   return (
     <SafeAreaView className="flex-1 bg-background-light dark:bg-background-dark">
@@ -18,12 +21,12 @@ export default function CirclesScreen() {
         <View className="py-2 px-4 bg-white/80 dark:bg-slate-900/80 border-b border-slate-100 dark:border-slate-800">
           <View className="flex-row items-center justify-between mb-4">
             <View className="flex-row items-center gap-3">
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/(tabs)')}>
                 <MaterialIcons name="arrow-back" size={24} className="text-slate-900 dark:text-white" />
               </TouchableOpacity>
               <Text className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Browse Circles</Text>
             </View>
-            <TouchableOpacity className="text-primary">
+            <TouchableOpacity onPress={() => Alert.alert('Location', 'Change location settings')} className="text-primary">
               <MaterialIcons name="location-on" size={24} color={primaryColor} />
             </TouchableOpacity>
           </View>
@@ -46,18 +49,18 @@ export default function CirclesScreen() {
 
           {/* Filters */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row gap-2 pb-2">
-            <TouchableOpacity className={`flex-row items-center ${primaryClass} px-4 h-8 rounded-full`}>
+            <TouchableOpacity onPress={() => Alert.alert('Filter', 'Applied: All Circles')} className={`flex-row items-center ${primaryClass} px-4 h-8 rounded-full`}>
               <Text className="text-white text-xs font-semibold">All Circles</Text>
             </TouchableOpacity>
-            <TouchableOpacity className="flex-row items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-4 h-8 rounded-full ml-2">
+            <TouchableOpacity onPress={() => Alert.alert('Filter', 'Applied: Flood')} className="flex-row items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-4 h-8 rounded-full ml-2">
               <MaterialIcons name="water-drop" size={16} className="text-slate-600 dark:text-slate-300" />
               <Text className="text-slate-600 dark:text-slate-300 text-xs font-semibold">Flood</Text>
             </TouchableOpacity>
-            <TouchableOpacity className="flex-row items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-4 h-8 rounded-full ml-2">
+            <TouchableOpacity onPress={() => Alert.alert('Filter', 'Applied: Fire')} className="flex-row items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-4 h-8 rounded-full ml-2">
               <MaterialIcons name="local-fire-department" size={16} className="text-slate-600 dark:text-slate-300" />
               <Text className="text-slate-600 dark:text-slate-300 text-xs font-semibold">Fire</Text>
             </TouchableOpacity>
-            <TouchableOpacity className="flex-row items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-4 h-8 rounded-full ml-2 mr-4">
+            <TouchableOpacity onPress={() => Alert.alert('Filter', 'Applied: Storm')} className="flex-row items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-4 h-8 rounded-full ml-2 mr-4">
               <MaterialIcons name="cyclone" size={16} className="text-slate-600 dark:text-slate-300" />
               <Text className="text-slate-600 dark:text-slate-300 text-xs font-semibold">Storm</Text>
             </TouchableOpacity>
@@ -80,7 +83,7 @@ export default function CirclesScreen() {
                 placeholderTextColor="#94a3b8"
                 className="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 h-10 text-sm text-slate-900 dark:text-white"
               />
-              <TouchableOpacity className={`${primaryClass} h-10 px-4 rounded-lg items-center justify-center`}>
+              <TouchableOpacity onPress={() => Alert.alert('Join Code', 'Invalid invite code or circle not found')} className={`${primaryClass} h-10 px-4 rounded-lg items-center justify-center`}>
                 <Text className="text-white text-sm font-bold">Join Private</Text>
               </TouchableOpacity>
             </View>
@@ -90,7 +93,7 @@ export default function CirclesScreen() {
           <View>
             <View className="flex-row items-center justify-between mb-4">
               <Text className="text-base font-bold text-slate-900 dark:text-white">Trending Circles</Text>
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => Alert.alert('View All', 'Loading more circles...')}>
                 <Text className={`text-xs font-semibold ${primaryTextClass}`}>View All</Text>
               </TouchableOpacity>
             </View>
@@ -126,8 +129,8 @@ export default function CirclesScreen() {
                   </View>
                 </View>
 
-                <TouchableOpacity className={`w-full ${primaryClass} h-11 items-center justify-center rounded-lg`}>
-                  <Text className="text-white font-bold text-sm">Join Circle</Text>
+                <TouchableOpacity onPress={() => router.push('/contribute')} className={`w-full ${primaryClass} h-11 items-center justify-center rounded-lg`}>
+                  <Text className="text-white font-bold text-sm">Contribute to Join</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -162,8 +165,8 @@ export default function CirclesScreen() {
                   </View>
                 </View>
 
-                <TouchableOpacity className={`w-full ${primaryClass} h-11 items-center justify-center rounded-lg`}>
-                  <Text className="text-white font-bold text-sm">Join Circle</Text>
+                <TouchableOpacity onPress={() => router.push('/contribute')} className={`w-full ${primaryClass} h-11 items-center justify-center rounded-lg`}>
+                  <Text className="text-white font-bold text-sm">Contribute to Join</Text>
                 </TouchableOpacity>
               </View>
             </View>

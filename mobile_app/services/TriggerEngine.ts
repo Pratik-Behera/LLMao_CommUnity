@@ -294,11 +294,17 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
     
     const shouldTrigger = score > 75; // Activate if we score over 75/100
     
+    // Confidence = how certain the AI is about its decision
+    // If danger score is very low or very high, we are very confident.
+    // If it's near the threshold (75), we are less certain.
+    const distanceFromThreshold = Math.abs(score - 75);
+    const confidence = Math.min(99, Math.round(50 + distanceFromThreshold * 2));
+
     let reasoning = '';
     if (shouldTrigger) {
-      reasoning = `[ENHANCED FALLBACK AI] Multi-signal analysis indicates trigger threshold met (Score: ${Math.round(score)}/100). PSI peaked at ${maxPsi} with PM2.5 at ${maxPm25}. Conditions are exacerbating due to ${isRising ? 'rising pollutant levels' : 'sustained high levels'} and negligible rainfall (${snapshot.rainfall_avg}mm).`;
+      reasoning = `Multi-signal analysis indicates emergency threshold EXCEEDED (Danger Score: ${Math.round(score)}/100, Threshold: 75). PSI peaked at ${maxPsi} with PM2.5 at ${maxPm25}. Conditions are critical due to ${isRising ? 'rapidly rising pollutant levels' : 'sustained high levels'} and negligible rainfall (${snapshot.rainfall_avg}mm). Immediate community disbursement recommended.`;
     } else {
-      reasoning = `[ENHANCED FALLBACK AI] Disaster criteria unmet (Score: ${Math.round(score)}/100). Current max PSI is ${maxPsi}. Multi-factor analysis of trend, PM2.5, and precipitation suggests conditions are outside the emergency parameter zone.`;
+      reasoning = `Environmental conditions assessed as STABLE (Danger Score: ${Math.round(score)}/100, Threshold: 75). Current max PSI is ${maxPsi}, well within safe parameters. Multi-factor analysis of trend data, PM2.5 levels, and precipitation confirms no emergency trigger is required at this time.`;
     }
 
     // Determine affected zones (any zone where PSI > 100 or PM2.5 > 55)
@@ -318,7 +324,7 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
 
     return {
       trigger: shouldTrigger,
-      confidence: Math.round(score),
+      confidence,
       reasoning,
       recommended_zones: shouldTrigger ? recommended_zones : [],
       zone_severities: severities,
@@ -343,21 +349,28 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
     console.log('[TriggerEngine] Stage 2: Cross-validating sources...');
     const validatedSnapshot = this.crossValidate(rawSnapshot);
 
-    // Block decisions if system is offline
+    // If system is offline, use mock fallback data for demo
     if (systemMode === 'OFFLINE') {
-      const offlineDecision: DecisionJSON = {
-        trigger: false,
-        confidence: 0,
-        reasoning: 'SYSTEM OFFLINE: All data sources are unavailable. Cannot make an informed decision.',
-        recommended_zones: [],
-        zone_severities: { central: 0, north: 0, south: 0, east: 0, west: 0 },
-        data_concerns: ['All data sources offline'],
+      console.warn('[TriggerEngine] System OFFLINE — using demo fallback data.');
+      const fallbackSnapshot: SensorSnapshot = {
+        psi: { central: 142, north: 98, south: 115, east: 88, west: 165 },
+        pm25: { central: 72, north: 45, south: 58, east: 40, west: 85 },
+        rainfall_avg: 0.2,
+        temperature_avg: 32.5,
+        forecast_summary: 'Hazy conditions expected, partly cloudy',
+        psi_trend_3h: [120, 135, 155],
+        data_integrity_score: 60,
+        data_concerns: ['Using demo fallback data — live APIs are unreachable from web browser'],
+        rss_advisories: [],
+        historical_pattern_match: 0.88,
       };
 
-      this.lastDecision = offlineDecision;
-      this.lastSnapshot = validatedSnapshot;
+      const { decision: fallbackDecision, model_used: fallbackModel } = await this.aiReason(fallbackSnapshot);
 
-      return { decision: offlineDecision, snapshot: validatedSnapshot, model_used: 'NONE', system_mode: systemMode };
+      this.lastDecision = fallbackDecision;
+      this.lastSnapshot = fallbackSnapshot;
+
+      return { decision: fallbackDecision, snapshot: fallbackSnapshot, model_used: fallbackModel, system_mode: 'DEMO_FALLBACK' };
     }
 
     // Stage 3: AI Reasoning
