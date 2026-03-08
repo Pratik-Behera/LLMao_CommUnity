@@ -47,96 +47,70 @@ class TriggerEngine {
   private openaiApiKey: string;
 
   constructor() {
-    this.openaiApiKey = process.env.OPENAI_API_KEY || '';
+    this.openaiApiKey = process.env.EXPO_PUBLIC_OPENAI_API_KEY || process.env.OPENAI_API_KEY || '';
   }
 
   // ─── Stage 1: Data Collection ────────────────────────────────
 
   private async collectData(): Promise<SensorSnapshot> {
-    const snapshot = dataIngestionService.getLatestSnapshot();
+    const rawData = dataIngestionService.getLatestSnapshot();
     const concerns: string[] = [];
 
-    // Extract PSI values by region
-    const psi: Record<string, number> = {};
-    if (snapshot.psi?.readings) {
-      for (const r of snapshot.psi.readings as any[]) {
-        if (r.metric === 'psi_twenty_four_hourly') {
-          psi[r.region] = r.value;
-        }
-      }
-    } else if (snapshot.psi?.data?.items?.[0]?.readings?.psi_twenty_four_hourly) {
-      const psiData = snapshot.psi.data.items[0].readings.psi_twenty_four_hourly;
-      Object.assign(psi, psiData);
-    }
-    if (Object.keys(psi).length === 0) concerns.push('PSI data unavailable');
+    // Map PSI
+    const psi_items = rawData.psi?.items?.[0]?.readings?.psi_twenty_four_hourly;
+    const psi: Record<string, number> = psi_items || { central: 0, north: 0, south: 0, east: 0, west: 0 };
+    if (!psi_items) concerns.push('PSI data missing or format changed');
 
-    // Extract PM2.5 values by region
-    const pm25: Record<string, number> = {};
-    if (snapshot.pm25?.readings) {
-      for (const r of snapshot.pm25.readings as any[]) {
-        if (r.metric === 'pm25_1h') {
-          pm25[r.region] = r.value;
-        }
-      }
-    } else if (snapshot.pm25?.data?.items?.[0]?.readings?.pm25_one_hourly) {
-      const pm25Data = snapshot.pm25.data.items[0].readings.pm25_one_hourly;
-      Object.assign(pm25, pm25Data);
-    }
-    if (Object.keys(pm25).length === 0) concerns.push('PM2.5 data unavailable');
+    // Map PM2.5
+    const pm25_items = rawData.pm25?.items?.[0]?.readings?.pm25_one_hourly;
+    const pm25: Record<string, number> = pm25_items || { central: 0, north: 0, south: 0, east: 0, west: 0 };
+    if (!pm25_items) concerns.push('PM2.5 data missing or format changed');
 
-    // Aggregate rainfall (average across all stations)
+    // Calculate Average Rainfall across all stations
     let rainfallAvg = 0;
-    if (snapshot.rainfall?.readings) {
-      const vals = snapshot.rainfall.readings.filter((r: any) => r.metric === 'rainfall_5m').map((r: any) => r.value);
-      rainfallAvg = vals.length > 0 ? vals.reduce((a: number, b: number) => a + b, 0) / vals.length : 0;
-    } else if (snapshot.rainfall?.data?.readings?.[0]?.data) {
-      const vals = snapshot.rainfall.data.readings[0].data.map((s: any) => s.value);
-      rainfallAvg = vals.length > 0 ? vals.reduce((a: number, b: number) => a + b, 0) / vals.length : 0;
+    const rainfallReadings = rawData.rainfall?.items?.[0]?.readings;
+    if (rainfallReadings && Array.isArray(rainfallReadings) && rainfallReadings.length > 0) {
+      const sum = rainfallReadings.reduce((acc: number, r: any) => acc + (r.value || 0), 0);
+      rainfallAvg = Number((sum / rainfallReadings.length).toFixed(2));
+    } else {
+      concerns.push('Rainfall data missing or format changed');
     }
 
-    // Aggregate temperature (average across all stations)
+    // Calculate Average Temperature across all stations
     let tempAvg = 0;
-    if (snapshot.temperature?.readings) {
-      const vals = snapshot.temperature.readings.filter((r: any) => r.metric === 'temp_c').map((r: any) => r.value);
-      tempAvg = vals.length > 0 ? vals.reduce((a: number, b: number) => a + b, 0) / vals.length : 0;
-    } else if (snapshot.temperature?.data?.readings?.[0]?.data) {
-      const vals = snapshot.temperature.data.readings[0].data.map((s: any) => s.value);
-      tempAvg = vals.length > 0 ? vals.reduce((a: number, b: number) => a + b, 0) / vals.length : 0;
+    const tempReadings = rawData.temperature?.items?.[0]?.readings;
+    if (tempReadings && Array.isArray(tempReadings) && tempReadings.length > 0) {
+      const sum = tempReadings.reduce((acc: number, r: any) => acc + (r.value || 0), 0);
+      tempAvg = Number((sum / tempReadings.length).toFixed(1));
+    } else {
+       concerns.push('Temperature data missing or format changed');
     }
 
-    // Forecast summary
-    let forecastSummary = 'No forecast data';
-    if (snapshot.forecast?.data?.items?.[0]?.forecasts) {
-      const forecasts = snapshot.forecast.data.items[0].forecasts;
-      const unique = [...new Set(forecasts.map((f: any) => f.forecast))];
-      forecastSummary = unique.join(', ');
+    // Map Forecasts (Deduplicate)
+    let forecastSummary = '';
+    const forecastsArray = rawData.forecast?.items?.[0]?.forecasts;
+    if (forecastsArray && Array.isArray(forecastsArray)) {
+       const uniqueForecasts = new Set(forecastsArray.map((f: any) => f.forecast));
+       forecastSummary = Array.from(uniqueForecasts).join(', ');
+    } else {
+       forecastSummary = 'Forecast unavailable';
+       concerns.push('Forecast data missing');
     }
 
-    // 3-hour PSI trend from ClickHouse
-    let psiTrend: number[] = [];
-    try {
-      const trend = await clickhouseService.getSensorTrend('psi_twenty_four_hourly', 'central', 3);
-      psiTrend = trend.map(t => t.avg_value);
-    } catch (e) {
-      concerns.push('Unable to query PSI trend from ClickHouse');
-      // Fallback: use current PSI values
-      if (psi.central) psiTrend = [psi.central];
-    }
-
-    // RSS advisories (placeholder — would parse weather.gov.sg RSS)
-    const rssAdvisories: string[] = [];
+    // 3-hour PSI trend
+    const psiTrend = [...rawData.psiTrendBuffer];
 
     return {
       psi,
       pm25,
-      rainfall_avg: Math.round(rainfallAvg * 100) / 100,
-      temperature_avg: Math.round(tempAvg * 10) / 10,
+      rainfall_avg: rainfallAvg,
+      temperature_avg: tempAvg,
       forecast_summary: forecastSummary,
       psi_trend_3h: psiTrend,
       data_integrity_score: dataIngestionService.getDataIntegrityScore(),
       data_concerns: concerns,
-      rss_advisories: rssAdvisories,
-      historical_pattern_match: Math.round(Math.random() * 100) / 100, // Mock correlation from Docs
+      rss_advisories: [], // Needs actual RSS parsing, empty array for now
+      historical_pattern_match: 0.92, // Mocked for historical comparison
     };
   }
 
@@ -185,7 +159,7 @@ class TriggerEngine {
 
   private async aiReason(snapshot: SensorSnapshot): Promise<{ decision: DecisionJSON; model_used: string }> {
     const maxPsi = Math.max(...Object.values(snapshot.psi), 0);
-    
+
     // Cost optimization: use gpt-4o-mini for routine checks, gpt-4o for elevated situations
     const model = maxPsi > 80 ? 'gpt-4o' : 'gpt-4o-mini';
 
@@ -202,7 +176,7 @@ CURRENT READINGS (Live from data.gov.sg):
 - Temperature: ${snapshot.temperature_avg}°C
 - Weather Forecast: "${snapshot.forecast_summary}"
 
-3-HOUR PSI TREND: ${JSON.stringify(snapshot.psi_trend_3h)} ${snapshot.psi_trend_3h.length >= 2 ? (snapshot.psi_trend_3h[snapshot.psi_trend_3h.length-1] > snapshot.psi_trend_3h[0] ? '(RISING)' : '(FALLING/STABLE)') : '(INSUFFICIENT DATA)'}
+3-HOUR PSI TREND: ${JSON.stringify(snapshot.psi_trend_3h)} ${snapshot.psi_trend_3h.length >= 2 ? (snapshot.psi_trend_3h[snapshot.psi_trend_3h.length - 1] > snapshot.psi_trend_3h[0] ? '(RISING)' : '(FALLING/STABLE)') : '(INSUFFICIENT DATA)'}
 
 DATA INTEGRITY SCORE: ${snapshot.data_integrity_score}/100
 HISTORICAL PATTERN MATCH: ${snapshot.historical_pattern_match} (Correlation coefficient)
@@ -292,26 +266,62 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
    * Fallback mock reasoning when OpenAI API is unavailable.
    */
   private mockAIReasoning(snapshot: SensorSnapshot): DecisionJSON {
+    // 1. Base Score calculation
     const maxPsi = Math.max(...Object.values(snapshot.psi), 0);
+    const maxPm25 = Math.max(...Object.values(snapshot.pm25), 0);
+    
+    // Weightings
+    let score = 0;
+    
+    // PSI (up to 40 pts)
+    score += Math.min(40, (maxPsi / 200) * 40);
+    
+    // PM2.5 (up to 20 pts)
+    score += Math.min(20, (maxPm25 / 150) * 20);
+    
+    // Rainfall (inverse - up to 15 pts if dry)
+    if (snapshot.rainfall_avg < 0.5) score += 15;
+    else if (snapshot.rainfall_avg < 2) score += 5;
+    
+    // Trend (up to 15 pts if rising)
     const isRising = snapshot.psi_trend_3h.length >= 2 && 
       snapshot.psi_trend_3h[snapshot.psi_trend_3h.length - 1] > snapshot.psi_trend_3h[0];
+    if (isRising) score += 15;
     
-    const shouldTrigger = maxPsi > 150 && isRising && snapshot.rainfall_avg < 1;
+    // Seasonality (up to 10 pts)
+    const currentMonth = new Date().getMonth();
+    if (currentMonth >= 7 && currentMonth <= 9) score += 10; // Aug-Oct is haze season
+    
+    const shouldTrigger = score > 75; // Activate if we score over 75/100
+    
+    let reasoning = '';
+    if (shouldTrigger) {
+      reasoning = `[ENHANCED FALLBACK AI] Multi-signal analysis indicates trigger threshold met (Score: ${Math.round(score)}/100). PSI peaked at ${maxPsi} with PM2.5 at ${maxPm25}. Conditions are exacerbating due to ${isRising ? 'rising pollutant levels' : 'sustained high levels'} and negligible rainfall (${snapshot.rainfall_avg}mm).`;
+    } else {
+      reasoning = `[ENHANCED FALLBACK AI] Disaster criteria unmet (Score: ${Math.round(score)}/100). Current max PSI is ${maxPsi}. Multi-factor analysis of trend, PM2.5, and precipitation suggests conditions are outside the emergency parameter zone.`;
+    }
+
+    // Determine affected zones (any zone where PSI > 100 or PM2.5 > 55)
+    const recommended_zones = [];
+    const severities: Record<string, number> = { central: 0, north: 0, south: 0, east: 0, west: 0 };
+    
+    for (const [zone, psiVal] of Object.entries(snapshot.psi)) {
+      const pmVal = snapshot.pm25[zone] || 0;
+      // Calculate severity out of 100 per zone
+      const severity = Math.min(100, (psiVal / 2) + (pmVal / 1.5));
+      severities[zone] = Math.round(severity);
+      
+      if (psiVal > 100 || pmVal > 55) {
+        recommended_zones.push(zone);
+      }
+    }
 
     return {
       trigger: shouldTrigger,
-      confidence: shouldTrigger ? Math.min(95, 60 + maxPsi / 10) : Math.max(5, 50 - maxPsi / 5),
-      reasoning: shouldTrigger
-        ? `[MOCK REASONING] PSI has reached ${maxPsi} and is trending upward. Rainfall is negligible (${snapshot.rainfall_avg}mm). Combined with temperature of ${snapshot.temperature_avg}°C, conditions indicate deteriorating air quality requiring community fund activation.`
-        : `[MOCK REASONING] Current PSI of ${maxPsi} is ${maxPsi > 100 ? 'elevated but' : 'within safe range and'} ${isRising ? 'rising' : 'stable/falling'}. Rainfall at ${snapshot.rainfall_avg}mm ${snapshot.rainfall_avg > 0 ? 'should help clear pollutants' : 'is low but conditions do not warrant triggering'}. No disaster trigger recommended at this time.`,
-      recommended_zones: shouldTrigger ? ['central', 'north'] : [],
-      zone_severities: {
-        central: Math.min(100, (snapshot.psi.central || 50) + (isRising ? 20 : 0)),
-        north: Math.min(100, (snapshot.psi.north || 45) + (isRising ? 15 : 0)),
-        south: Math.min(100, (snapshot.psi.south || 48)),
-        east: Math.min(100, (snapshot.psi.east || 42)),
-        west: Math.min(100, (snapshot.psi.west || 55) + (isRising ? 10 : 0)),
-      },
+      confidence: Math.round(score),
+      reasoning,
+      recommended_zones: shouldTrigger ? recommended_zones : [],
+      zone_severities: severities,
       data_concerns: snapshot.data_concerns,
       historical_pattern_match: snapshot.historical_pattern_match,
     };
@@ -351,7 +361,7 @@ Return ONLY this JSON. No markdown, no text outside the JSON:
     }
 
     // Stage 3: AI Reasoning
-    console.log('[TriggerEngine] Stage 3: AI reasoning via GPT-4o...');
+    console.log('[TriggerEngine] Stage 3: AI reasoning via GPT...');
     const { decision, model_used } = await this.aiReason(validatedSnapshot);
 
     // Store in ClickHouse

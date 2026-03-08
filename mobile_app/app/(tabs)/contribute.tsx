@@ -7,10 +7,11 @@ import { mockPaymentEngine, PaymentFlowProgress } from '../../services/PaymentEn
 import { useRouter } from 'expo-router';
 import { Card, Button, Badge } from '../../components/ui/shadcn';
 import OpenPaymentsLiveDemo from '../../components/OpenPaymentsLiveDemo';
+import { mockDistributionEngine } from '../../services/DistributionEngine';
 import * as WebBrowser from 'expo-web-browser';
 
 export default function ContributeScreen() {
-  const { isAdmin } = useAuth();
+  const { isAdmin, user } = useAuth();
   const router = useRouter();
   const [amount, setAmount] = useState('10');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -21,25 +22,52 @@ export default function ContributeScreen() {
     setIsProcessing(true);
     const flow = mockPaymentEngine.startPaymentFlow(amount, paymentPointer);
     
-    for await (const progress of flow) {
-      setPaymentProgress(progress);
+    try {
+      for await (const progress of flow) {
+        setPaymentProgress(progress);
 
-      // --- REAL REDIRECT CONNECTION (Demo Mode) ---
-      if (progress.state === 'WAITING_CONSENT' && progress.redirectUrl) {
-          console.log(`[Demo] Opening Consent Redirect: ${progress.redirectUrl}`);
-          const result = await WebBrowser.openBrowserAsync(progress.redirectUrl);
-          console.log(`[Demo] Browser session: ${result.type}`);
+        if (progress.state === 'WAITING_CONSENT' && progress.redirectUrl) {
+            console.log(`[Demo] Opening Consent Redirect: ${progress.redirectUrl}`);
+            const result = await WebBrowser.openBrowserAsync(progress.redirectUrl);
+            
+            if (result.type === 'cancel') {
+                setPaymentProgress({ 
+                  state: 'ERROR', 
+                  message: 'Authorization Cancelled by User' 
+                });
+                setIsProcessing(false);
+                return;
+            }
+        }
       }
-
-      if (progress.state === 'ERROR' || progress.state === 'COMPLETED') {
-        setTimeout(() => {
-          if (progress.state === 'COMPLETED') {
-            setIsProcessing(false);
-            setPaymentProgress(null);
-          }
-        }, 3000);
-      }
+    } catch (e) {
+      console.error('[Contribute] Payment Error:', e);
+      setPaymentProgress({ state: 'ERROR', message: 'Protocol Negotiation Failed' });
+      setIsProcessing(false);
     }
+  };
+
+  const handleFinalizeSettlement = async () => {
+    setIsProcessing(true);
+    const flow = mockPaymentEngine.finalizeSettlement(paymentPointer);
+    
+    try {
+      for await (const progress of flow) {
+        setPaymentProgress(progress);
+        
+        // --- SYNC WITH LEDGER ---
+        if (progress.state === 'COMPLETED') {
+           await mockDistributionEngine.recordContribution(
+             parseFloat(amount), 
+             user.walletId, 
+             progress.transactionId || `TX-${Date.now()}`
+           );
+        }
+      }
+    } catch (e) {
+      setPaymentProgress({ state: 'ERROR', message: 'Final Settlement Failed' });
+    }
+    setIsProcessing(false);
   };
 
   return (
@@ -53,8 +81,9 @@ export default function ContributeScreen() {
           {/* PREMIUM HEADER */}
           <View className="flex-row items-center px-6 pt-4 pb-4 bg-white dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800">
             <TouchableOpacity 
-              onPress={() => router.back()}
-              className="h-10 w-10 items-center justify-center rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
+              onPress={() => !isProcessing && router.push('/(tabs)')}
+              disabled={isProcessing}
+              className={`h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 ${isProcessing ? 'opacity-30 bg-slate-100' : 'bg-slate-50 dark:bg-slate-900'}`}
             >
               <ChevronLeft size={20} color="#64748b" />
             </TouchableOpacity>
@@ -91,9 +120,10 @@ export default function ContributeScreen() {
                 <View className="flex-row items-center bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 h-16 shadow-sm">
                   <MaterialIcons name="link" size={20} color="#6366f1" />
                   <TextInput 
-                      className="flex-1 ml-3 font-bold text-sm text-slate-900 dark:text-white"
+                      className={`flex-1 ml-3 font-bold text-sm ${isProcessing ? 'text-slate-400' : 'text-slate-900 dark:text-white'}`}
                       value={paymentPointer}
                       onChangeText={setPaymentPointer}
+                      editable={!isProcessing}
                       placeholder="$wallet.example/user"
                       autoCapitalize="none"
                   />
@@ -112,8 +142,9 @@ export default function ContributeScreen() {
                   {['10', '50', '100', '500'].map((val) => (
                     <TouchableOpacity 
                       key={val}
-                      onPress={() => setAmount(val)}
-                      className={`flex-1 h-14 rounded-2xl items-center justify-center border-2 ${amount === val ? 'bg-indigo-600 border-indigo-600' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'}`}
+                      onPress={() => !isProcessing && setAmount(val)}
+                      disabled={isProcessing}
+                      className={`flex-1 h-14 rounded-2xl items-center justify-center border-2 ${amount === val ? 'bg-indigo-600 border-indigo-600' : 'bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800'} ${isProcessing && amount !== val ? 'opacity-50' : ''}`}
                     >
                       <Text className={`font-black text-sm ${amount === val ? 'text-white' : 'text-slate-600 dark:text-slate-400'}`}>${val}</Text>
                     </TouchableOpacity>
@@ -126,19 +157,20 @@ export default function ContributeScreen() {
                <View className="flex-row items-center bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 h-16 shadow-sm">
                   <DollarSign size={20} color="#6366f1" />
                   <TextInput 
-                     className="flex-1 ml-3 font-black text-xl text-slate-900 dark:text-white"
+                     className="flex-1 ml-3 font-black text-xl text-slate-900 dark:text-white outline-none"
                      placeholder="0.00"
                      placeholderTextColor="#94a3b8"
                      keyboardType="numeric"
                      value={amount}
                      onChangeText={setAmount}
+                     textAlign="left"
                   />
                   <Text className="text-slate-400 font-bold uppercase text-[10px] tracking-widest">SGD</Text>
                </View>
             </View>
 
             {/* SETTLEMENT PREVIEW */}
-            <Card className="p-6 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950">
+            <Card className="p-6 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 mb-10">
                <View className="flex-row items-center gap-2 mb-6">
                   <CreditCard size={16} color="#6366f1" />
                   <Text className="text-slate-900 dark:text-white font-bold text-sm">Settlement Breakdown</Text>
@@ -161,27 +193,25 @@ export default function ContributeScreen() {
                </View>
             </Card>
 
-            <View className="py-20" />
-          </ScrollView>
+            {/* STATIC PAY BUTTON INSTEAD OF ABSOLUTE TO FIX OVERLAPPING */}
+            <Button 
+              onPress={handleStandardPayment}
+              disabled={isProcessing}
+              variant="admin"
+              className="h-16 shadow-2xl shadow-indigo-600/30 w-full mb-10"
+            >
+              {isProcessing ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Zap size={20} color="white" fill="white" className="mr-2" />
+              )}
+              <Text className="text-white font-black uppercase tracking-widest text-sm">
+                {isProcessing ? 'Settling Protocol...' : 'Authorize Open Payment'}
+              </Text>
+            </Button>
 
-          {/* FLOAT PAY BUTTON */}
-          <View className="absolute bottom-8 left-6 right-6">
-             <Button 
-                onPress={handleStandardPayment}
-                disabled={isProcessing}
-                variant="admin"
-                className="h-16 shadow-2xl shadow-indigo-600/30"
-             >
-                {isProcessing ? (
-                  <ActivityIndicator color="white" />
-                ) : (
-                  <Zap size={20} color="white" fill="white" className="mr-2" />
-                )}
-                <Text className="text-white font-black uppercase tracking-widest text-sm">
-                   {isProcessing ? 'Settling Protocol...' : 'Authorize Open Payment'}
-                </Text>
-             </Button>
-          </View>
+            <View className="py-10" />
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
 
@@ -210,12 +240,35 @@ export default function ContributeScreen() {
                   </View>
                )}
 
+               {paymentProgress?.state === 'WAITING_CONSENT' && (
+                  <View className="w-full mt-4">
+                     <Text className="text-[10px] text-slate-400 font-bold mb-4 text-center leading-4">
+                        Please return to the app once you've authorized the transaction in your wallet.
+                     </Text>
+                     <Button 
+                        onPress={handleFinalizeSettlement}
+                        className="w-full bg-indigo-600 h-14"
+                     >
+                        <Text className="text-white font-black uppercase tracking-widest text-xs">Verify & Complete Settlement</Text>
+                     </Button>
+                  </View>
+               )}
+
                {(paymentProgress?.state === 'COMPLETED' || paymentProgress?.state === 'ERROR') && (
                   <Button 
-                     onPress={() => setPaymentProgress(null)}
-                     className="w-full bg-slate-900 dark:bg-slate-800"
+                     onPress={() => {
+                        const isSuccess = paymentProgress.state === 'COMPLETED';
+                        setPaymentProgress(null);
+                        if (isSuccess) {
+                           setAmount('10');
+                           router.push('/(tabs)');
+                        }
+                     }}
+                     className="w-full bg-slate-900 dark:bg-slate-800 h-14 mt-4"
                   >
-                     <Text className="text-white font-black uppercase tracking-widest text-xs">Dismiss</Text>
+                     <Text className="text-white font-black uppercase tracking-widest text-xs">
+                        {paymentProgress.state === 'COMPLETED' ? 'Complete Journey' : 'Dismiss'}
+                     </Text>
                   </Button>
                )}
             </View>

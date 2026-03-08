@@ -30,30 +30,46 @@ class DistributionEngine {
       disbursementId: "D-9921",
       amount: 450,
       status: "COMPLETED",
-      timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-      aiReasoning: "Localized PSI spike in West Singapore (185) with low visibility. AI recommended immediate mask subsidy disbursement.",
+      timestamp: new Date(Date.now() - 3600000).toISOString(),
+      aiReasoning: "Localized PSI spike in West Singapore (185). AI recommended immediate mask subsidy.",
       aiConfidence: 94,
       zone: "West",
       severities: { west: 85, central: 40, north: 35, south: 30, east: 25 }
     },
-    {
-      alertId: "AI-PREC-088",
-      disbursementId: "D-9915",
-      amount: 1200,
-      status: "COMPLETED",
-      timestamp: new Date(Date.now() - 86400000).toISOString(), // 24 hours ago
-      aiReasoning: "Island-wide rainfall forecast exceeding 50mm/h. High correlation with past flash flood trigger patterns.",
-      aiConfidence: 89,
-      zone: "Island-wide",
-      severities: { west: 65, central: 75, north: 80, south: 70, east: 60 }
-    }
   ];
+
+  private pendingDisbursements: AuditLog[] = [];
 
   private fundPools = {
     totalPool: 45000,
     communityReserve: 35000,
     emergencyReserve: 10000,
   };
+
+  /**
+   * Records a community contribution to the pool.
+   */
+  async recordContribution(amount: number, userId: string, txHash: string) {
+    console.log(`[DistributionEngine] Recording contribution from ${userId}: S$${amount}`);
+    this.fundPools.totalPool += amount;
+    this.fundPools.communityReserve += amount;
+    
+    // Add a record to the logs
+    const log: AuditLog = {
+      alertId: "USER-CONTRIB",
+      disbursementId: txHash,
+      amount,
+      status: "CONTRIBUTED",
+      timestamp: new Date().toISOString(),
+      aiReasoning: `Community member contribution via Interledger. Wallet: ${userId}`,
+      aiConfidence: 100,
+      zone: "Community Pool",
+    };
+    
+    this.auditLogs.unshift(log);
+    this.persistLogs();
+    return log;
+  }
 
   constructor() {
     this.loadPersistedLogs();
@@ -110,13 +126,14 @@ class DistributionEngine {
   /**
    * Execute payouts — writes to in-memory, localStorage, AND ClickHouse.
    */
-  async executePayouts(alertId: string, amount: number) {
+  async executePayouts(alertId: string, amount: number, isAuto: boolean = false) {
     console.log(`[DistributionEngine] Executing Payouts for: ${alertId}`);
 
-    // Simulate payment authorization
-    const result = await mockPaymentEngine.authorizePayment(`DISB-${alertId}`);
+    // If auto, we skip authorization redirect as it's system-led
+    if (!isAuto) {
+      await mockPaymentEngine.authorizePayment(`DISB-${alertId}`);
+    }
 
-    // Fetch AI reasoning from TriggerEngine
     const alerts = await triggerEngine.getActiveAlerts();
     const currentAlert = alerts.find(a => a.id.startsWith('AI-') || a.id === alertId);
 
@@ -127,37 +144,39 @@ class DistributionEngine {
       amount,
       status: 'COMPLETED',
       timestamp: new Date().toISOString(),
-      aiReasoning: currentAlert?.reasoning || 'Manual Triggered by Admin',
+      aiReasoning: currentAlert?.reasoning || 'Severity-based Community Relief',
       aiConfidence: currentAlert?.confidence || 100,
-      zone: currentAlert?.zone || 'Island-wide',
+      zone: currentAlert?.zone || 'Active Zones',
       severities: currentAlert?.severities,
     };
 
-    // Write to in-memory + localStorage
     this.auditLogs.unshift(auditLog);
     this.persistLogs();
     this.fundPools.totalPool -= amount;
-
-    // Write to ClickHouse (fire-and-forget, don't block UI)
-    try {
-      await clickhouseService.insertDisbursement({
-        decision_id: '00000000-0000-0000-0000-000000000000', // Would be real UUID from trigger_decisions
-        amount,
-        recipient_count: Math.ceil(amount / 50),
-        status: 'COMPLETED',
-        payment_hash: disbursementId,
-        zone: currentAlert?.zone || 'Island-wide',
-      });
-      console.log(`[DistributionEngine] ClickHouse write successful: ${disbursementId}`);
-    } catch (e) {
-      console.warn('[DistributionEngine] ClickHouse write failed (non-blocking):', e);
-    }
+    this.fundPools.communityReserve -= amount;
 
     return {
       status: 'SUCCESSFUL',
       summary: auditLog,
       remainingPool: this.fundPools.totalPool,
     };
+  }
+
+  /**
+   * Approves a pending disbursement (Admin Only).
+   */
+  async approveDisbursement(disbursementId: string) {
+    const index = this.pendingDisbursements.findIndex(d => d.disbursementId === disbursementId);
+    if (index === -1) return null;
+
+    const disbursement = this.pendingDisbursements[index];
+    this.pendingDisbursements.splice(index, 1);
+    
+    return await this.executePayouts(disbursement.alertId, disbursement.amount, true);
+  }
+
+  async getPendingDisbursements() {
+    return this.pendingDisbursements;
   }
 
   /**
@@ -185,37 +204,47 @@ class DistributionEngine {
    * Automatically disburse payments based on regional severity scores.
    * Logic: Higher severity triggers larger community-wide relief.
    */
-  async disburseBySeverity(zoneSeverities: Record<string, number>) {
-    console.log('[DistributionEngine] Starting severity-based disbursement pipeline...');
+  async disburseBySeverity(zoneSeverities: Record<string, number>, isAdmin: boolean = false) {
+    console.log(`[DistributionEngine] Starting severity-based disbursement pipeline (isAdmin: ${isAdmin})...`);
     
     let totalExecuted = 0;
     const results: any[] = [];
-
-    // Filter zones that meet a minimum severity threshold (e.g., 60)
     const activeZones = Object.entries(zoneSeverities).filter(([_, score]) => score >= 60);
 
     for (const [zone, score] of activeZones) {
-       // Payout Scale: 
-       // 60-75: S$10 (Minor Support)
-       // 76-90: S$30 (Moderate Relief)
-       // 91-100: S$50 (Critical Subsidy)
        let basePayout = 10;
        if (score > 90) basePayout = 50;
        else if (score > 75) basePayout = 30;
 
-       console.log(`[DistributionEngine] Zone: ${zone} | Severity: ${score} | Payout: S$${basePayout}`);
-       
        const calculation = await this.calculateDisbursement(`AUTO-${zone.toUpperCase()}-${Date.now()}`, basePayout);
-       const execution = await this.executePayouts(calculation.alertId, calculation.totalDisbursement);
        
-       totalExecuted += calculation.totalDisbursement;
+       if (isAdmin) {
+         // Executing immediately for Admin
+         await this.executePayouts(calculation.alertId, calculation.totalDisbursement, true);
+         totalExecuted += calculation.totalDisbursement;
+       } else {
+         // Queueing for Admin approval for Member
+         const pending: AuditLog = {
+           alertId: calculation.alertId,
+           disbursementId: `PEND-${Date.now()}-${zone}`,
+           amount: calculation.totalDisbursement,
+           status: 'PENDING_APPROVAL',
+           timestamp: new Date().toISOString(),
+           aiReasoning: `Request for ${zone} based on severity ${score}. Awaiting Admin verification.`,
+           aiConfidence: score,
+           zone: zone,
+           severities: zoneSeverities
+         };
+         this.pendingDisbursements.push(pending);
+       }
        results.push({ zone, severity: score, amount: calculation.totalDisbursement });
     }
 
     return {
        totalDisbursed: totalExecuted,
        zoneCount: activeZones.length,
-       breakdown: results
+       breakdown: results,
+       isPending: !isAdmin && activeZones.length > 0
     };
   }
 

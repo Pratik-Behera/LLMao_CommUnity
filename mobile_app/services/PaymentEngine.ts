@@ -1,7 +1,7 @@
 /**
  * State of the current payment transaction.
  */
-export type PaymentState = 'IDLE' | 'RESOLVING' | 'GRANNING_ACCESS' | 'QUOTING' | 'WAITING_CONSENT' | 'EXECUTING' | 'COMPLETED' | 'ERROR';
+export type PaymentState = 'IDLE' | 'RESOLVING' | 'GRANNING_ACCESS' | 'QUOTING' | 'WAITING_CONSENT' | 'REQUIRES_USER_VERIFICATION' | 'VERIFYING' | 'EXECUTING' | 'COMPLETED' | 'ERROR';
 
 export interface PaymentFlowProgress {
   state: PaymentState;
@@ -67,46 +67,51 @@ class PaymentEngine {
    * High-level method to orchestrate the entire payment flow.
    * Useful for the UI to consume via a single entry point.
    */
+  /**
+   * High-level method to orchestrate the initial payment discovery and consent.
+   */
   async *startPaymentFlow(amount: string, receiverPointer: string): AsyncGenerator<PaymentFlowProgress> {
     try {
-      // 1. Discovery & Resolve
-      yield { state: 'RESOLVING', message: 'Discovering Wallet Address...' };
+      yield { state: 'RESOLVING', message: 'Resolving Payment Pointer...' };
       const receiver = await this.resolvePaymentPointer(receiverPointer);
       
-      // 2. Request Incoming Payment Grant
-      yield { state: 'GRANNING_ACCESS', message: 'Requesting Incoming Payment Grant...' };
-      await new Promise(r => setTimeout(r, 1000));
+      yield { state: 'GRANNING_ACCESS', message: 'Initiating GNAP Access Grant Flow...' };
+      await new Promise(r => setTimeout(r, 1200));
       
-      // 3. Create Incoming Payment (Receiver Side) - Documented in API Docs
-      yield { state: 'QUOTING', message: 'Generating Transaction Quote...' };
-      const fee = (parseFloat(amount) * 0.02).toFixed(2);
+      yield { state: 'QUOTING', message: 'Negotiating Transaction Quote...' };
       await new Promise(r => setTimeout(r, 1200));
 
-      // 4. Outreach for Consent (Simulated Redirect)
       yield { 
         state: 'WAITING_CONSENT', 
-        message: 'Awaiting Wallet Authorization...',
+        message: 'Awaiting External Wallet Authorization...',
         redirectUrl: `https://wallet.interledger-test.dev/auth/approve?amount=${amount}&receiver=${receiverPointer}`
       };
-      
-      // Wait for the simulated redirect flow in the browser.
-      await new Promise(r => setTimeout(r, 8000));
+    } catch (error) {
+      yield { state: 'ERROR', message: 'Discovery Failed: ' + (error as Error).message };
+    }
+  }
 
-      // 5. Final Execution
-      yield { state: 'EXECUTING', message: 'Executing Interledger Packets...' };
-      await new Promise(r => setTimeout(r, 1500));
+  /**
+   * Finalizes the settlement after user consent is confirmed.
+   * This is where the actual ILP packet streaming and hash generation happens.
+   */
+  async *finalizeSettlement(receiverPointer: string): AsyncGenerator<PaymentFlowProgress> {
+    try {
+      yield { state: 'VERIFYING', message: 'Verifying Protocol Interaction...' };
+      await new Promise(r => setTimeout(r, 2000));
 
-      // 6. Completion - Using Transaction ID format from Docs
-      const txId = paymentPointerMatches(receiverPointer, 'alice') ? 'OP-TX-9821-X' : `TXN-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+      yield { state: 'EXECUTING', message: 'Settling Interledger Packets...' };
+      await new Promise(r => setTimeout(r, 2500));
+
+      const txId = paymentPointerMatches(receiverPointer, 'alice') ? 'OP-TX-9821-X' : `OP-TX-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
       
       yield { 
         state: 'COMPLETED', 
-        message: 'Payment Completed via Open Payments', 
+        message: 'ILP Transaction Successfully Settled', 
         transactionId: txId 
       };
-
     } catch (error) {
-      yield { state: 'ERROR', message: 'Payment Failed: ' + (error as Error).message };
+      yield { state: 'ERROR', message: 'Settlement Failed: ' + (error as Error).message };
     }
   }
 
