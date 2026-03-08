@@ -7,9 +7,12 @@ import { triggerEngine } from '../../services/TriggerEngine';
 import AuditLogItem from '../../components/AuditLogItem';
 import ZoneSeverityMap from '../../components/ZoneSeverityMap';
 import EnvironmentalStatus from '../../components/EnvironmentalStatus';
+import { useRouter } from 'expo-router';
+import { Alert } from 'react-native';
 
 export default function HomeScreen() {
   const { isAdmin } = useAuth();
+  const router = useRouter();
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRunningDiagnostics, setIsRunningDiagnostics] = useState(false);
@@ -42,16 +45,35 @@ export default function HomeScreen() {
     const result = await triggerEngine.evaluateTrigger();
     setZoneSeverities(result.decision.zone_severities);
 
-    // Stage 2: If trigger recommended, execute distribution
+    // Stage 2: If trigger recommended, execute severity-based payout
     if (result.decision.trigger) {
-      await mockDistributionEngine.executePayouts(
-        result.decision.recommended_zones[0], 
-        result.decision.confidence * 20 // Base payout based on confidence
-      );
+      await mockDistributionEngine.disburseBySeverity(result.decision.zone_severities);
       await fetchLogs();
     }
     
     setIsRunningDiagnostics(false);
+  };
+
+  const handleRequestAid = async () => {
+    setIsLoading(true);
+    // Requesting aid for the current user's zone based on AI severity
+    const result = await mockDistributionEngine.disburseBySeverity(zoneSeverities);
+    
+    if (result.totalDisbursed > 0) {
+      Alert.alert(
+        "Relief Disbursed", 
+        `Triggered relief for ${result.zoneCount} active zones. Total of S$${result.totalDisbursed} moved from pool.`,
+        [{ text: "View Audit", onPress: () => fetchLogs() }]
+      );
+    } else {
+      Alert.alert(
+        "Request Pending", 
+        "AI diagnostics currently indicate severities are within safe thresholds. Request is logged for manual admin review.",
+        [{ text: "OK" }]
+      );
+    }
+    await fetchLogs();
+    setIsLoading(false);
   };
 
   return (
@@ -121,17 +143,23 @@ export default function HomeScreen() {
             </View>
           </View>
 
-           {/* Quick Actions */}
-           <View className="flex-row gap-3 mb-6">
-             <TouchableOpacity className="flex-1 h-14 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 items-center justify-center flex-row gap-2">
-                <MaterialIcons name="add-card" size={20} color={primaryColor} />
-                <Text className="font-bold text-slate-700 dark:text-slate-300">Contribute</Text>
-             </TouchableOpacity>
-             <TouchableOpacity className="flex-1 h-14 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 items-center justify-center flex-row gap-2">
-                <MaterialIcons name="request-quote" size={20} color={primaryColor} />
-                <Text className="font-bold text-slate-700 dark:text-slate-300">Request Aid</Text>
-             </TouchableOpacity>
-          </View>
+            {/* Quick Actions */}
+            <View className="flex-row gap-3 mb-6">
+              <TouchableOpacity 
+                onPress={() => router.push('/contribute')}
+                className="flex-1 h-14 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 items-center justify-center flex-row gap-2"
+              >
+                 <MaterialIcons name="add-card" size={20} color={primaryColor} />
+                 <Text className="font-bold text-slate-700 dark:text-slate-300">Contribute</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                onPress={handleRequestAid}
+                className="flex-1 h-14 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 items-center justify-center flex-row gap-2"
+              >
+                 <MaterialIcons name="request-quote" size={20} color={primaryColor} />
+                 <Text className="font-bold text-slate-700 dark:text-slate-300">Request Aid</Text>
+              </TouchableOpacity>
+           </View>
 
           {/* Audit Logs Trail */}
           <View>

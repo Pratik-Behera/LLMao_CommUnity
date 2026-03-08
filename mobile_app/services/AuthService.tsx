@@ -21,7 +21,7 @@ const mockUser: User = {
   name: 'Alex Johnson',
   role: 'Admin',
   zone: 'Brooklyn Heights',
-  walletId: '$ilp.rafiki.money/alex',
+  walletId: '$ilp.interledger-test.dev/6f8390fa',
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

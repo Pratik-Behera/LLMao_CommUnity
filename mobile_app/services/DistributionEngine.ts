@@ -182,6 +182,44 @@ class DistributionEngine {
   }
 
   /**
+   * Automatically disburse payments based on regional severity scores.
+   * Logic: Higher severity triggers larger community-wide relief.
+   */
+  async disburseBySeverity(zoneSeverities: Record<string, number>) {
+    console.log('[DistributionEngine] Starting severity-based disbursement pipeline...');
+    
+    let totalExecuted = 0;
+    const results: any[] = [];
+
+    // Filter zones that meet a minimum severity threshold (e.g., 60)
+    const activeZones = Object.entries(zoneSeverities).filter(([_, score]) => score >= 60);
+
+    for (const [zone, score] of activeZones) {
+       // Payout Scale: 
+       // 60-75: S$10 (Minor Support)
+       // 76-90: S$30 (Moderate Relief)
+       // 91-100: S$50 (Critical Subsidy)
+       let basePayout = 10;
+       if (score > 90) basePayout = 50;
+       else if (score > 75) basePayout = 30;
+
+       console.log(`[DistributionEngine] Zone: ${zone} | Severity: ${score} | Payout: S$${basePayout}`);
+       
+       const calculation = await this.calculateDisbursement(`AUTO-${zone.toUpperCase()}-${Date.now()}`, basePayout);
+       const execution = await this.executePayouts(calculation.alertId, calculation.totalDisbursement);
+       
+       totalExecuted += calculation.totalDisbursement;
+       results.push({ zone, severity: score, amount: calculation.totalDisbursement });
+    }
+
+    return {
+       totalDisbursed: totalExecuted,
+       zoneCount: activeZones.length,
+       breakdown: results
+    };
+  }
+
+  /**
    * Returns current fund health health
    * Ref: cursor_docs/api_documentation.md
    */

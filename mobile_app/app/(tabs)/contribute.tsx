@@ -1,11 +1,13 @@
 import { View, Text, ScrollView, TextInput, TouchableOpacity, SafeAreaView, Modal, ActivityIndicator, KeyboardAvoidingView, Platform, StatusBar } from 'react-native';
 import { Shield, CreditCard, ChevronLeft, Info, CheckCircle, Zap, ArrowRight, DollarSign } from 'lucide-react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { useAuth } from '../../services/AuthService';
 import { mockPaymentEngine, PaymentFlowProgress } from '../../services/PaymentEngine';
 import { useRouter } from 'expo-router';
 import { Card, Button, Badge } from '../../components/ui/shadcn';
 import OpenPaymentsLiveDemo from '../../components/OpenPaymentsLiveDemo';
+import * as WebBrowser from 'expo-web-browser';
 
 export default function ContributeScreen() {
   const { isAdmin } = useAuth();
@@ -13,13 +15,22 @@ export default function ContributeScreen() {
   const [amount, setAmount] = useState('10');
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentProgress, setPaymentProgress] = useState<PaymentFlowProgress | null>(null);
+  const [paymentPointer, setPaymentPointer] = useState('$ilp.interledger-test.dev/6f8390fa');
 
   const handleStandardPayment = async () => {
     setIsProcessing(true);
-    const flow = mockPaymentEngine.startPaymentFlow(amount, '$ilp.rafiki.money/brooklyn-heights');
+    const flow = mockPaymentEngine.startPaymentFlow(amount, paymentPointer);
     
     for await (const progress of flow) {
       setPaymentProgress(progress);
+
+      // --- REAL REDIRECT CONNECTION (Demo Mode) ---
+      if (progress.state === 'WAITING_CONSENT' && progress.redirectUrl) {
+          console.log(`[Demo] Opening Consent Redirect: ${progress.redirectUrl}`);
+          const result = await WebBrowser.openBrowserAsync(progress.redirectUrl);
+          console.log(`[Demo] Browser session: ${result.type}`);
+      }
+
       if (progress.state === 'ERROR' || progress.state === 'COMPLETED') {
         setTimeout(() => {
           if (progress.state === 'COMPLETED') {
@@ -69,6 +80,27 @@ export default function ContributeScreen() {
             {/* LIVE DEMO SECTION */}
             <OpenPaymentsLiveDemo amount={amount} />
 
+            {/* WALLET CONNECTION SECTION */}
+            <View className="mt-10 mb-6">
+                <View className="flex-row items-center justify-between mb-4">
+                  <Text className="text-slate-900 dark:text-white font-black text-lg">Connect Wallet Pointer</Text>
+                  <Badge variant="outline" className="border-indigo-600">
+                    <Text className="text-indigo-600 text-[10px] uppercase font-bold">Interledger Test Wallet</Text>
+                  </Badge>
+                </View>
+                <View className="flex-row items-center bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-2xl px-5 h-16 shadow-sm">
+                  <MaterialIcons name="link" size={20} color="#6366f1" />
+                  <TextInput 
+                      className="flex-1 ml-3 font-bold text-sm text-slate-900 dark:text-white"
+                      value={paymentPointer}
+                      onChangeText={setPaymentPointer}
+                      placeholder="$wallet.example/user"
+                      autoCapitalize="none"
+                  />
+                  <MaterialIcons name="check-circle" size={18} color="#10b981" />
+                </View>
+            </View>
+
             {/* AMOUNT SELECTION */}
             <View className="mt-10 mb-6">
                <View className="flex-row items-center justify-between mb-4">
@@ -115,7 +147,7 @@ export default function ContributeScreen() {
                <View className="gap-5">
                   <View className="flex-row justify-between items-center">
                      <Text className="text-slate-500 text-xs font-medium">Recipient Pointer</Text>
-                     <Text className="text-indigo-600 dark:text-indigo-400 text-xs font-mono font-bold">$ilp.rafiki.money/brooklyn</Text>
+                     <Text className="text-indigo-600 dark:text-indigo-400 text-xs font-mono font-bold">{paymentPointer}</Text>
                   </View>
                   <View className="flex-row justify-between items-center">
                      <Text className="text-slate-500 text-xs font-medium">Protocol</Text>

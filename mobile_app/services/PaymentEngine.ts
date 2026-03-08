@@ -24,23 +24,43 @@ class PaymentEngine {
   async resolvePaymentPointer(paymentPointer: string) {
     this.currentState = 'RESOLVING';
     console.log(`[PaymentEngine] Phase 1 - Resolving: ${paymentPointer}`);
-    await new Promise(r => setTimeout(r, 800));
     
-    // Return standard demo data if it's the alice example pointer
-    if (paymentPointer === '$ilp.rafiki.money/alice') {
-        return {
-            authServer: "https://auth.rafiki.money",
-            assetCode: "USD",
-            walletAddress: "https://ilp.rafiki.money/alice"
-        };
-    }
+    // Normalize $pointer to https://url
+    const url = paymentPointer.replace('$', 'https://');
 
-    return {
-      authServer: "https://auth.rafiki.money",
-      assetCode: "SGD",
-      walletAddress: `https://ilp.rafiki.money/wallet/${paymentPointer.replace('$', '')}`,
-      paymentAccount: "https://rafiki.money/accounts/comm-unity-fund"
-    };
+    try {
+      const res = await fetch(url, {
+        headers: {
+          'Accept': 'application/json'
+        },
+        // In a real Open Payments app, you'd use the Open Payments SDK
+        // but since we are in a demo, we hit the discovery endpoint directly.
+      });
+
+      if (!res.ok) {
+        throw new Error(`Pointer resolution failed: ${res.status}`);
+      }
+
+      const walletAddress = await res.json();
+      console.log(`[PaymentEngine] Discovered Wallet: ${walletAddress.publicName} (${walletAddress.assetCode})`);
+      
+      return {
+        authServer: walletAddress.authServer,
+        assetCode: walletAddress.assetCode,
+        assetScale: walletAddress.assetScale,
+        walletAddress: walletAddress.id,
+        publicName: walletAddress.publicName
+      };
+    } catch (e) {
+      console.warn(`[PaymentEngine] Resolution failed, falling back to demo metadata:`, e);
+      // Fallback for non-functional sandbox pointers in offline/restricted environments
+      return {
+        authServer: "https://auth.interledger-test.dev",
+        assetCode: "SGD",
+        walletAddress: `https://ilp.interledger-test.dev/wallet/${paymentPointer.replace('$', '')}`,
+        paymentAccount: "https://rafiki.money/accounts/comm-unity-fund"
+      };
+    }
   }
 
   /**
@@ -69,8 +89,8 @@ class PaymentEngine {
         redirectUrl: `https://wallet.interledger-test.dev/auth/approve?amount=${amount}&receiver=${receiverPointer}`
       };
       
-      // In a real app, the component would pause here and resume after capturing the redirect.
-      await new Promise(r => setTimeout(r, 3000));
+      // Wait for the simulated redirect flow in the browser.
+      await new Promise(r => setTimeout(r, 8000));
 
       // 5. Final Execution
       yield { state: 'EXECUTING', message: 'Executing Interledger Packets...' };
